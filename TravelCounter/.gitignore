@@ -97,3 +97,7 @@ test-results.xcresult
 
 ## シンボルグラフ
 *.symbols.json
+
+## 設定ファイル
+GoogleService-Info.plist
+Firebase Authentication Info.plist

@@ -6,12 +6,25 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import GoogleSignIn
 
 @main
 struct TravelCounterApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AuthView()
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
+                .onAppear {
+                    // 既存のサインイン状態を確認
+                    if GIDSignIn.sharedInstance.hasPreviousSignIn() {
+                        GIDSignIn.sharedInstance.restorePreviousSignIn()
+                    }
+                }
         }
     }
 }

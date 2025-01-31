@@ -7,18 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		221176442D4A734E0037C44A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 221176432D4A734E0037C44A /* FirebaseAnalytics */; };
+		221176462D4A734E0037C44A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 221176452D4A734E0037C44A /* FirebaseCore */; };
+		22C67B002D4A854D00C1952C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67AFF2D4A854D00C1952C /* FirebaseAuth */; };
+		22C67B2D2D4A862500C1952C /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67B2C2D4A862500C1952C /* GoogleSignIn */; };
+		22C67B2F2D4A862500C1952C /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67B2E2D4A862500C1952C /* GoogleSignInSwift */; };
 		22D6C4062D4A630D00C47272 /* Inject in Frameworks */ = {isa = PBXBuildFile; productRef = 22D6C4052D4A630D00C47272 /* Inject */; };
 		22D6C41B2D4A63E400C47272 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 22D6C41A2D4A63E400C47272 /* Alamofire */; };
-		22D6C41D2D4A63E400C47272 /* AlamofireDynamic in Frameworks */ = {isa = PBXBuildFile; productRef = 22D6C41C2D4A63E400C47272 /* AlamofireDynamic */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		22D6C3DD2D4A4C8300C47272 /* TravelCounter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelCounter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		22C67AFE2D4A82AF00C1952C /* Exceptions for "TravelCounter" folder in "TravelCounter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 22D6C3DC2D4A4C8300C47272 /* TravelCounter */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		22D6C3DF2D4A4C8300C47272 /* TravelCounter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				22C67AFE2D4A82AF00C1952C /* Exceptions for "TravelCounter" folder in "TravelCounter" target */,
+			);
 			path = TravelCounter;
 			sourceTree = "<group>";
 		};
@@ -30,8 +47,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				22D6C4062D4A630D00C47272 /* Inject in Frameworks */,
-				22D6C41D2D4A63E400C47272 /* AlamofireDynamic in Frameworks */,
+				22C67B002D4A854D00C1952C /* FirebaseAuth in Frameworks */,
+				221176462D4A734E0037C44A /* FirebaseCore in Frameworks */,
+				22C67B2F2D4A862500C1952C /* GoogleSignInSwift in Frameworks */,
+				221176442D4A734E0037C44A /* FirebaseAnalytics in Frameworks */,
 				22D6C41B2D4A63E400C47272 /* Alamofire in Frameworks */,
+				22C67B2D2D4A862500C1952C /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +98,11 @@
 				22D6C4052D4A630D00C47272 /* Inject */,
 				22D6C41A2D4A63E400C47272 /* Alamofire */,
 				22D6C41C2D4A63E400C47272 /* AlamofireDynamic */,
+				221176432D4A734E0037C44A /* FirebaseAnalytics */,
+				221176452D4A734E0037C44A /* FirebaseCore */,
+				22C67AFF2D4A854D00C1952C /* FirebaseAuth */,
+				22C67B2C2D4A862500C1952C /* GoogleSignIn */,
+				22C67B2E2D4A862500C1952C /* GoogleSignInSwift */,
 			);
 			productName = TravelCounter;
 			productReference = 22D6C3DD2D4A4C8300C47272 /* TravelCounter.app */;
@@ -109,6 +135,8 @@
 			packageReferences = (
 				22D6C4042D4A630D00C47272 /* XCRemoteSwiftPackageReference "Inject" */,
 				22D6C4072D4A63A300C47272 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22D6C3DE2D4A4C8300C47272 /* Products */;
@@ -271,6 +299,7 @@
 				DEVELOPMENT_TEAM = 67B8R6CZM3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TravelCounter/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -281,7 +310,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.udemyKabu.TravelCounter;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kabu.TravelCounter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -300,6 +329,7 @@
 				DEVELOPMENT_TEAM = 67B8R6CZM3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TravelCounter/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,7 +340,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.udemyKabu.TravelCounter;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kabu.TravelCounter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -342,6 +372,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		22D6C4042D4A630D00C47272 /* XCRemoteSwiftPackageReference "Inject" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/krzysztofzablocki/Inject.git";
@@ -358,9 +396,42 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.7.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		221176432D4A734E0037C44A /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		221176452D4A734E0037C44A /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		22C67AFF2D4A854D00C1952C /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		22C67B2C2D4A862500C1952C /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		22C67B2E2D4A862500C1952C /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		22D6C4052D4A630D00C47272 /* Inject */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 22D6C4042D4A630D00C47272 /* XCRemoteSwiftPackageReference "Inject" */;
