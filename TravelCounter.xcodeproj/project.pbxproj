@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		221176442D4A734E0037C44A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 221176432D4A734E0037C44A /* FirebaseAnalytics */; };
 		221176462D4A734E0037C44A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 221176452D4A734E0037C44A /* FirebaseCore */; };
+		225834342D4F7849007A15F9 /* AMJpnMap in Frameworks */ = {isa = PBXBuildFile; productRef = 225834332D4F7849007A15F9 /* AMJpnMap */; };
 		22C67B002D4A854D00C1952C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67AFF2D4A854D00C1952C /* FirebaseAuth */; };
 		22C67B2D2D4A862500C1952C /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67B2C2D4A862500C1952C /* GoogleSignIn */; };
 		22C67B2F2D4A862500C1952C /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 22C67B2E2D4A862500C1952C /* GoogleSignInSwift */; };
@@ -47,6 +48,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22D6C4062D4A630D00C47272 /* Inject in Frameworks */,
+				225834342D4F7849007A15F9 /* AMJpnMap in Frameworks */,
 				22C67B002D4A854D00C1952C /* FirebaseAuth in Frameworks */,
 				221176462D4A734E0037C44A /* FirebaseCore in Frameworks */,
 				22C67B2F2D4A862500C1952C /* GoogleSignInSwift in Frameworks */,
@@ -103,6 +105,7 @@
 				22C67AFF2D4A854D00C1952C /* FirebaseAuth */,
 				22C67B2C2D4A862500C1952C /* GoogleSignIn */,
 				22C67B2E2D4A862500C1952C /* GoogleSignInSwift */,
+				225834332D4F7849007A15F9 /* AMJpnMap */,
 			);
 			productName = TravelCounter;
 			productReference = 22D6C3DD2D4A4C8300C47272 /* TravelCounter.app */;
@@ -137,6 +140,7 @@
 				22D6C4072D4A63A300C47272 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				225834322D4F7849007A15F9 /* XCRemoteSwiftPackageReference "AMJpnMapView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22D6C3DE2D4A4C8300C47272 /* Products */;
@@ -372,6 +376,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		225834322D4F7849007A15F9 /* XCRemoteSwiftPackageReference "AMJpnMapView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adventam10/AMJpnMapView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.1;
+			};
+		};
 		22C67B012D4A858500C1952C /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
@@ -416,6 +428,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 22D6C42C2D4A71DD00C47272 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		225834332D4F7849007A15F9 /* AMJpnMap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 225834322D4F7849007A15F9 /* XCRemoteSwiftPackageReference "AMJpnMapView" */;
+			productName = AMJpnMap;
 		};
 		22C67AFF2D4A854D00C1952C /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

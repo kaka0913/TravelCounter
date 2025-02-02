@@ -1,5 +1,5 @@
 {
-  "originHash" : "079c37436efcc5c116facea49e6db1f5a0db54dfdc4fa6b9e7023a4e6ef9bb35",
+  "originHash" : "e95c10f86c68b67069657139bdb51903aa16b4d8889a9a033521e0bd8ee11a7c",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "amjpnmapview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adventam10/AMJpnMapView.git",
+      "state" : {
+        "revision" : "06956d98270f258e81c2616432ac2e883c62e178",
+        "version" : "2.1.1"
       }
     },
     {
