@@ -1,5 +1,5 @@
 {
-  "originHash" : "e95c10f86c68b67069657139bdb51903aa16b4d8889a9a033521e0bd8ee11a7c",
+  "originHash" : "d044b30977a403bd4f5fb16d3b9dcf6797307034598741020299eea8f8f4ef3a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -17,15 +17,6 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
-      }
-    },
-    {
-      "identity" : "amjpnmapview",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/adventam10/AMJpnMapView.git",
-      "state" : {
-        "revision" : "06956d98270f258e81c2616432ac2e883c62e178",
-        "version" : "2.1.1"
       }
     },
     {
@@ -170,6 +161,15 @@
       "state" : {
         "revision" : "ebc7251dd5b37f627c93698e4374084d98409633",
         "version" : "1.28.2"
+      }
+    },
+    {
+      "identity" : "tapablejapanmapbyprefecture",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:kaka0913/TapableJapanMapByPrefecture.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "d4cb1d28439132407fbcbf86cb8d94768911d353"
       }
     }
   ],

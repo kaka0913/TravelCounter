@@ -43,9 +43,21 @@ struct PrefectualMapOfJapanView: View {
                 .padding()
                 
                 if let selectedRegion = viewModel.selectedRegion {
-                    Text("\(selectedRegion.name): \(viewModel.getVisitCount(for: selectedRegion))回訪問")
-                        .font(.title2)
-                        .padding()
+                    VStack(spacing: 8) {
+                        if viewModel.isShowingDetailMap {
+                            Text("\(selectedRegion.name)地方")
+                                .font(.headline)
+                        } else {
+                            Text("\(selectedRegion.name)地方: \(viewModel.getVisitCount(for: selectedRegion))回訪問")
+                                .font(.headline)
+                        }
+                        
+                        if viewModel.isShowingDetailMap, let selectedPrefecture = viewModel.selectedPrefecture {
+                            Text("\(selectedPrefecture.name): \(viewModel.getVisitCount(for: selectedPrefecture))回訪問")
+                                .font(.title2)
+                        }
+                    }
+                    .padding()
                 }
                 
                 Spacer()

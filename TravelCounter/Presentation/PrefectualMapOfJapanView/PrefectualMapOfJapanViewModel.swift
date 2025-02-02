@@ -4,6 +4,7 @@ import UIKit
 
 class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var selectedRegion: AMRegion?
+    @Published var selectedPrefecture: AMPrefecture?
     @Published var isShowingDetailMap: Bool = false
     
     // モックデータ: 地域ごとの訪問回数
@@ -38,8 +39,21 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         }
     }
     
+    func selectPrefecture(_ prefecture: AMPrefecture) {
+        selectedPrefecture = prefecture
+    }
+    
+    func deselectPrefecture(_ prefecture: AMPrefecture) {
+        if selectedPrefecture == prefecture {
+            selectedPrefecture = nil
+        }
+    }
+    
     func toggleMapType() {
         isShowingDetailMap.toggle()
+        // 地図タイプを切り替えるときに選択状態をリセット
+        selectedRegion = nil
+        selectedPrefecture = nil
     }
     
     // 訪問回数に基づく色を取得（地域用）
