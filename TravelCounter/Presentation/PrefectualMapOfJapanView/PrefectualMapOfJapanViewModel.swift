@@ -6,6 +6,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var selectedRegion: AMRegion?
     @Published var selectedPrefecture: AMPrefecture?
     @Published var isShowingDetailMap: Bool = false
+    @Published var currentUser: UserProfile?
+    @Published var userGroups: [UserGroup] = []
     
     // モックデータ: 地域ごとの訪問回数
     private var regionVisitCounts: [AMRegion: Int] = [
@@ -28,6 +30,44 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         .fukuoka: 1,
         .okinawa: 3
     ]
+    
+    init() {
+        // モックデータの設定
+        currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
+        
+        // グループとユーザーのモックデータ
+        userGroups = [
+            UserGroup(
+                id: 1,
+                name: "家族",
+                iconName: "house.fill",
+                users: [
+                    UserProfile(id: 1, name: "父", imageURL: nil),
+                    UserProfile(id: 2, name: "母", imageURL: nil),
+                    UserProfile(id: 3, name: "兄", imageURL: nil)
+                ]
+            ),
+            UserGroup(
+                id: 2,
+                name: "友達",
+                iconName: "person.2.fill",
+                users: [
+                    UserProfile(id: 4, name: "友達A", imageURL: nil),
+                    UserProfile(id: 5, name: "友達B", imageURL: nil)
+                ]
+            ),
+            UserGroup(
+                id: 3,
+                name: "同僚",
+                iconName: "briefcase.fill",
+                users: [
+                    UserProfile(id: 6, name: "同僚A", imageURL: nil),
+                    UserProfile(id: 7, name: "同僚B", imageURL: nil),
+                    UserProfile(id: 8, name: "同僚C", imageURL: nil)
+                ]
+            )
+        ]
+    }
     
     func selectRegion(_ region: AMRegion) {
         selectedRegion = region

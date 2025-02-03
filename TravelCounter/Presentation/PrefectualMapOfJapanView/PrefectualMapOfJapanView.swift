@@ -92,7 +92,12 @@ struct PrefectualMapOfJapanView: View {
             DrawerView(
                 width: UIScreen.main.bounds.width * 0.7,
                 isOpen: isDrawerOpen,
-                onClose: { isDrawerOpen = false }
+                onClose: { isDrawerOpen = false },
+                currentUser: viewModel.currentUser,
+                userGroups: viewModel.userGroups,
+                onUserSelect: { user in
+                    print("Selected user: \(user.name)")
+                }
             )
             .zIndex(1)
         }
