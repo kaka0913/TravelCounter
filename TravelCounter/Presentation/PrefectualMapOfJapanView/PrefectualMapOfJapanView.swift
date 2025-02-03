@@ -31,7 +31,7 @@ struct PrefectualMapOfJapanView: View {
                         ForEach([(0, "未訪問"), (1, "1回"), (2, "2-3回"), (4, "4-5回"), (6, "6回以上")], id: \.0) { count, label in
                             HStack {
                                 RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color(viewModel.getColorForCount(count)))
+                                    .fill(Color(ColorUtility.getColorForCount(count)))
                                     .frame(width: 20, height: 20)
                                 Text(label)
                                     .font(.caption)

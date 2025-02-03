@@ -9,7 +9,30 @@ import SwiftUI
 import AMJpnMap
 
 struct JapanDetailMapViewRepresentable: UIViewRepresentable {
+    //本来はviewModelを記述すべきではないが可読性を優先させるために記述
     @ObservedObject var viewModel: PrefectualMapOfJapanViewModel
+    
+    // 訪問回数に応じた色を返す
+    private func getColorForCount(_ count: Int) -> UIColor {
+        switch count {
+        case 0:
+            return .systemGray5  // 未訪問
+        case 1:
+            return .systemYellow.withAlphaComponent(0.7)  // 1回
+        case 2...3:
+            return .systemGreen.withAlphaComponent(0.7)   // 2-3回
+        case 4...5:
+            return .systemBlue.withAlphaComponent(0.7)    // 4-5回
+        default:
+            return .systemRed.withAlphaComponent(0.7)     // 6回以上
+        }
+    }
+    
+    // 都道府県の訪問回数に基づく色を取得
+    private func getColorForPrefecture(_ prefecture: AMPrefecture) -> UIColor {
+        let count = viewModel.getVisitCount(for: prefecture)
+        return getColorForCount(count)
+    }
     
     func makeUIView(context: Context) -> AMJpnMapDetailView {
         let mapView = AMJpnMapDetailView()
@@ -25,7 +48,7 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
             viewModel.selectRegion(prefecture.region)
             
             // 選択時の視覚的フィードバック
-            let baseColor = viewModel.getColorForPrefecture(prefecture)
+            let baseColor = getColorForPrefecture(prefecture)
             mapView.setFillColor(color: baseColor.withAlphaComponent(1.0), prefecture: prefecture)
             mapView.setStrokeColor(color: .black, prefecture: prefecture)
         }
@@ -36,7 +59,7 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
             viewModel.deselectRegion(prefecture.region)
             
             // 選択解除時の視覚的フィードバック
-            let originalColor = viewModel.getColorForPrefecture(prefecture)
+            let originalColor = getColorForPrefecture(prefecture)
             mapView.setFillColor(color: originalColor.withAlphaComponent(0.7), prefecture: prefecture)
             mapView.setStrokeColor(color: .gray, prefecture: prefecture)
         }
@@ -44,7 +67,7 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
         // 都道府県ごとの色を設定（遅延実行）
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             for prefecture in AMPrefecture.allCases {
-                let color = viewModel.getColorForPrefecture(prefecture)
+                let color = getColorForPrefecture(prefecture)
                 mapView.setFillColor(color: color.withAlphaComponent(0.7), prefecture: prefecture)
                 mapView.setStrokeColor(color: .gray, prefecture: prefecture)
             }
@@ -55,7 +78,7 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
     
     func updateUIView(_ uiView: AMJpnMapDetailView, context: Context) {
         for prefecture in AMPrefecture.allCases {
-            let color = viewModel.getColorForPrefecture(prefecture)
+            let color = getColorForPrefecture(prefecture)
             if viewModel.selectedPrefecture == prefecture {
                 uiView.setFillColor(color: color.withAlphaComponent(1.0), prefecture: prefecture)
                 uiView.setStrokeColor(color: .black, prefecture: prefecture)
