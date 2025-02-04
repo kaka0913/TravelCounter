@@ -4,11 +4,16 @@ import AMJpnMap
 struct PrefectualMapOfJapanView: View {
     @StateObject private var viewModel = PrefectualMapOfJapanViewModel()
     @State private var isDrawerOpen = false
+    @State private var mapScale: CGFloat = 1.0
+    @State private var mapOffset: CGSize = .zero
+    @State private var lastMapOffset: CGSize = .zero
+    @State private var magnificationScale: CGFloat = 1.0
     
     var body: some View {
         ZStack {
             GeometryReader { geometry in
-                VStack {
+                VStack(spacing: 0) {
+                    // ヘッダー部分
                     HStack {
                         Button(action: {
                             isDrawerOpen.toggle()
@@ -19,21 +24,74 @@ struct PrefectualMapOfJapanView: View {
                                 .padding()
                         }
                         Spacer()
+                        
+                        if mapScale != 1.0 || mapOffset != .zero {
+                            Button(action: {
+                                withAnimation {
+                                    mapScale = 1.0
+                                    magnificationScale = 1.0
+                                    mapOffset = .zero
+                                    lastMapOffset = .zero
+                                }
+                            }) {
+                                Image(systemName: "arrow.counterclockwise")
+                                    .font(.title2)
+                                    .foregroundColor(.primary)
+                                    .padding()
+                            }
+                        }
                     }
                     
-                    HStack {
-                        Spacer()
-                        if viewModel.isShowingDetailMap {
-                            JapanDetailMapViewRepresentable(viewModel: viewModel)
-                                .frame(width: geometry.size.width * 0.8,
-                                       height: geometry.size.height * 0.5)
-                        } else {
-                            JapanMapViewRepresentable(viewModel: viewModel)
-                                .frame(width: geometry.size.width * 0.8,
-                                       height: geometry.size.height * 0.5)
-                        }
-                        Spacer()
+                    // 地図部分（固定高さ）
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.clear)
+                            .frame(height: geometry.size.height * 0.6)
+                            .clipped()
+                            .overlay(
+                                ZStack {
+                                    if viewModel.isShowingDetailMap {
+                                        JapanDetailMapViewRepresentable(viewModel: viewModel)
+                                            .frame(width: geometry.size.width * 0.8,
+                                                   height: geometry.size.height * 0.4)
+                                    } else {
+                                        JapanMapViewRepresentable(viewModel: viewModel)
+                                            .frame(width: geometry.size.width * 0.8,
+                                                   height: geometry.size.height * 0.4)
+                                    }
+                                }
+                                .scaleEffect(mapScale)
+                                .offset(x: viewModel.constrainOffset(mapOffset, in: geometry.size, scale: mapScale).width,
+                                        y: viewModel.constrainOffset(mapOffset, in: geometry.size, scale: mapScale).height)
+                                .gesture(
+                                    SimultaneousGesture(
+                                        DragGesture()
+                                            .onChanged { value in
+                                                let newOffset = CGSize(
+                                                    width: lastMapOffset.width + value.translation.width,
+                                                    height: lastMapOffset.height + value.translation.height
+                                                )
+                                                mapOffset = viewModel.constrainOffset(newOffset, in: geometry.size, scale: mapScale)
+                                            }
+                                            .onEnded { value in
+                                                lastMapOffset = mapOffset
+                                            },
+                                        MagnificationGesture()
+                                            .onChanged { value in
+                                                let newScale = value.magnitude * magnificationScale
+                                                mapScale = min(max(newScale, 0.5), 3.0)
+                                                mapOffset = viewModel.constrainOffset(mapOffset, in: geometry.size, scale: mapScale)
+                                            }
+                                            .onEnded { value in
+                                                magnificationScale = mapScale
+                                                mapOffset = viewModel.constrainOffset(mapOffset, in: geometry.size, scale: mapScale)
+                                                lastMapOffset = mapOffset
+                                            }
+                                    )
+                                )
+                            )
                     }
+                    .frame(height: geometry.size.height * 0.6)
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("訪問回数")
@@ -76,6 +134,13 @@ struct PrefectualMapOfJapanView: View {
                     Spacer()
                     
                     Button(action: {
+                        // マップ切り替え時にズームとオフセットをリセット
+                        withAnimation {
+                            mapScale = 1.0
+                            magnificationScale = 1.0
+                            mapOffset = .zero
+                            lastMapOffset = .zero
+                        }
                         viewModel.toggleMapType()
                     }) {
                         Text(viewModel.isShowingDetailMap ? "地方マップ" : "詳細マップ")

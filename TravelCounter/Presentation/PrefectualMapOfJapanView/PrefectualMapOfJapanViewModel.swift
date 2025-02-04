@@ -30,7 +30,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         .fukuoka: 1,
         .okinawa: 3
     ]
-    
+
+
     init() {
         // モックデータの設定
         currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
@@ -103,5 +104,28 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     
     func getVisitCount(for prefecture: AMPrefecture) -> Int {
         return prefectureVisitCounts[prefecture] ?? 0
+    }
+
+    func constrainOffset(_ offset: CGSize, in geometrySize: CGSize, scale: CGFloat) -> CGSize {
+        let maxHeight = geometrySize.height * 0.6
+        let mapHeight = geometrySize.height * 0.4
+        let scaledMapHeight = mapHeight * scale
+        
+        // 地図の中心から移動可能な距離を計算
+        let verticalLimit = (maxHeight - mapHeight) / 2
+        
+        // 地図の幅に基づく水平方向の制限
+        let mapWidth = geometrySize.width * 0.8
+        let scaledMapWidth = mapWidth * scale
+        let horizontalLimit = (geometrySize.width - mapWidth) / 2
+        
+        // スケールに応じて移動可能範囲を調整
+        let adjustedVerticalLimit = verticalLimit + abs(scaledMapHeight - mapHeight) / 2
+        let adjustedHorizontalLimit = horizontalLimit + abs(scaledMapWidth - mapWidth) / 2
+        
+        return CGSize(
+            width: max(min(offset.width, adjustedHorizontalLimit), -adjustedHorizontalLimit),
+            height: max(min(offset.height, adjustedVerticalLimit), -adjustedVerticalLimit)
+        )
     }
 }
