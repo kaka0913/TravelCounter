@@ -30,8 +30,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         .fukuoka: 1,
         .okinawa: 3
     ]
-
-
+    
     init() {
         // モックデータの設定
         currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
@@ -105,7 +104,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     func getVisitCount(for prefecture: AMPrefecture) -> Int {
         return prefectureVisitCounts[prefecture] ?? 0
     }
-
+    
     func constrainOffset(_ offset: CGSize, in geometrySize: CGSize, scale: CGFloat) -> CGSize {
         let maxHeight = geometrySize.height * 0.6
         let mapHeight = geometrySize.height * 0.4
