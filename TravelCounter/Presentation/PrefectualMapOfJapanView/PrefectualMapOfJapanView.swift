@@ -8,6 +8,7 @@ struct PrefectualMapOfJapanView: View {
     @State private var mapOffset: CGSize = .zero
     @State private var lastMapOffset: CGSize = .zero
     @State private var magnificationScale: CGFloat = 1.0
+    @State private var showingCreateNewPost = false
     
     var body: some View {
         NavigationView {
@@ -218,13 +219,15 @@ struct PrefectualMapOfJapanView: View {
                         print("Create new group")
                     },
                     onCreatePost: {
-                        // TODO: 新規投稿画面への遷移
-                        print("Create new post")
+                        showingCreateNewPost = true
                     }
                 )
                 .zIndex(1)
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showingCreateNewPost) {
+                CreateNewPostView()
+            }
         }
     }
 }
