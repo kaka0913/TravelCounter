@@ -136,13 +136,45 @@ struct PrefectualMapOfJapanView: View {
                                     Text("\(selectedRegion.name)地方")
                                         .font(.headline)
                                 } else {
-                                    Text("\(selectedRegion.name)地方: \(viewModel.getVisitCount(for: selectedRegion))回訪問")
-                                        .font(.headline)
+                                    if let group = viewModel.selectedGroup {
+                                        if let member = viewModel.selectedGroupMember {
+                                            Text("\(selectedRegion.name)地方: \(viewModel.getVisitCount(for: selectedRegion))回訪問")
+                                                .font(.headline)
+                                            Text("(\(member.name)さんの訪問数)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        } else {
+                                            Text("\(selectedRegion.name)地方: \(viewModel.getGroupVisitCount(for: selectedRegion))回訪問")
+                                                .font(.headline)
+                                            Text("(\(group.name)メンバー全員の合計)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
+                                    } else {
+                                        Text("\(selectedRegion.name)地方: \(viewModel.getVisitCount(for: selectedRegion))回訪問")
+                                            .font(.headline)
+                                    }
                                 }
                                 
                                 if viewModel.isShowingDetailMap, let selectedPrefecture = viewModel.selectedPrefecture {
-                                    Text("\(selectedPrefecture.name): \(viewModel.getVisitCount(for: selectedPrefecture))回訪問")
-                                        .font(.title3)
+                                    if let group = viewModel.selectedGroup {
+                                        if let member = viewModel.selectedGroupMember {
+                                            Text("\(selectedPrefecture.name): \(viewModel.getVisitCount(for: selectedPrefecture))回訪問")
+                                                .font(.title3)
+                                            Text("(\(member.name)さんの訪問数)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        } else {
+                                            Text("\(selectedPrefecture.name): \(viewModel.getGroupVisitCount(for: selectedPrefecture))回訪問")
+                                                .font(.title3)
+                                            Text("(\(group.name)メンバー全員の合計)")
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
+                                    } else {
+                                        Text("\(selectedPrefecture.name): \(viewModel.getVisitCount(for: selectedPrefecture))回訪問")
+                                            .font(.title3)
+                                    }
                                     
                                     NavigationLink {
                                         PostDisplayMapView(selectedPrefecture: selectedPrefecture)
@@ -170,8 +202,16 @@ struct PrefectualMapOfJapanView: View {
                     onClose: { isDrawerOpen = false },
                     currentUser: viewModel.currentUser,
                     userGroups: viewModel.userGroups,
+                    selectedGroup: viewModel.selectedGroup,
+                    selectedGroupMember: viewModel.selectedGroupMember,
                     onUserSelect: { user in
-                        print("Selected user: \(user.name)")
+                        viewModel.selectGroupMember(user)
+                    },
+                    onGroupSelect: { group in
+                        viewModel.selectGroup(group)
+                    },
+                    onResetSelect: {
+                        viewModel.resetSelection()
                     }
                 )
                 .zIndex(1)

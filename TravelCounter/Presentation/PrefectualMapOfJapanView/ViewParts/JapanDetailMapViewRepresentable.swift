@@ -30,7 +30,19 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
     
     // 都道府県の訪問回数に基づく色を取得
     private func getColorForPrefecture(_ prefecture: AMPrefecture) -> UIColor {
-        let count = viewModel.getVisitCount(for: prefecture)
+        let count: Int
+        if let group = viewModel.selectedGroup {
+            if let member = viewModel.selectedGroupMember {
+                // メンバーが選択されている場合は、そのメンバーの訪問回数
+                count = viewModel.getVisitCount(for: prefecture)
+            } else {
+                // グループが選択されている場合は、グループ全体の訪問回数
+                count = viewModel.getGroupVisitCount(for: prefecture)
+            }
+        } else {
+            // グループもメンバーも選択されていない場合は、現在のユーザーの訪問回数
+            count = viewModel.getVisitCount(for: prefecture)
+        }
         return getColorForCount(count)
     }
     
@@ -43,9 +55,9 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
         
         // コールバックを設定
         mapView.didSelectPrefecture = { prefecture in
-            viewModel.selectPrefecture(prefecture)
+            viewModel.selectedPrefecture = prefecture
             // 対応する地域も選択
-            viewModel.selectRegion(prefecture.region)
+            viewModel.selectedRegion = prefecture.region
             
             // 選択時の視覚的フィードバック
             let baseColor = getColorForPrefecture(prefecture)
@@ -54,9 +66,11 @@ struct JapanDetailMapViewRepresentable: UIViewRepresentable {
         }
         
         mapView.didDeselectPrefecture = { prefecture in
-            viewModel.deselectPrefecture(prefecture)
-            // 地域の選択も解除
-            viewModel.deselectRegion(prefecture.region)
+            if viewModel.selectedPrefecture == prefecture {
+                viewModel.selectedPrefecture = nil
+                // 地域の選択も解除
+                viewModel.selectedRegion = nil
+            }
             
             // 選択解除時の視覚的フィードバック
             let originalColor = getColorForPrefecture(prefecture)

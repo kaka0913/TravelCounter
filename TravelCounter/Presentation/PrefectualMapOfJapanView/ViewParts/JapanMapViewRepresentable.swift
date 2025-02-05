@@ -14,7 +14,19 @@ struct JapanMapViewRepresentable: UIViewRepresentable {
     
     // 地域の訪問回数に基づく色を取得
     private func getColorForRegion(_ region: AMRegion) -> UIColor {
-        let count = viewModel.getVisitCount(for: region)
+        let count: Int
+        if let group = viewModel.selectedGroup {
+            if let member = viewModel.selectedGroupMember {
+                // メンバーが選択されている場合は、そのメンバーの訪問回数
+                count = viewModel.getVisitCount(for: region)
+            } else {
+                // グループが選択されている場合は、グループ全体の訪問回数
+                count = viewModel.getGroupVisitCount(for: region)
+            }
+        } else {
+            // グループもメンバーも選択されていない場合は、現在のユーザーの訪問回数
+            count = viewModel.getVisitCount(for: region)
+        }
         return ColorUtility.getColorForCount(count)
     }
     
@@ -70,7 +82,7 @@ struct JapanMapViewRepresentable: UIViewRepresentable {
         }
         
         func jpnMapView(_ jpnMapView: AMJpnMapView, didSelectAtRegion region: AMRegion) {
-            viewModel.selectRegion(region)
+            viewModel.selectedRegion = region
             
             // 選択時の視覚的フィードバック
             let baseColor = parent?.getColorForRegion(region) ?? .systemGray5
@@ -79,7 +91,9 @@ struct JapanMapViewRepresentable: UIViewRepresentable {
         }
         
         func jpnMapView(_ jpnMapView: AMJpnMapView, didDeselectAtRegion region: AMRegion) {
-            viewModel.deselectRegion(region)
+            if viewModel.selectedRegion == region {
+                viewModel.selectedRegion = nil
+            }
             
             // 選択解除時の視覚的フィードバック
             let originalColor = parent?.getColorForRegion(region) ?? .systemGray5

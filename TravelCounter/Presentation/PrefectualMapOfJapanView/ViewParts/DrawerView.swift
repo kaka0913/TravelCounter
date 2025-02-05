@@ -6,7 +6,11 @@ struct DrawerView: View {
     let onClose: () -> Void
     let currentUser: UserProfile?
     let userGroups: [UserGroup]
+    let selectedGroup: UserGroup?
+    let selectedGroupMember: UserProfile?
     let onUserSelect: (UserProfile) -> Void
+    let onGroupSelect: (UserGroup) -> Void
+    let onResetSelect: () -> Void
     
     @State private var expandedGroupIds: Set<Int> = []
     
@@ -19,19 +23,24 @@ struct DrawerView: View {
                     if let currentUser = currentUser {
                         VStack(alignment: .leading, spacing: 8) {
                             Circle()
-                                .fill(Color.gray.opacity(0.3))
+                                .fill(selectedGroup == nil && selectedGroupMember == nil ? Color.blue.opacity(0.2) : Color.gray.opacity(0.3))
                                 .frame(width: 60, height: 60)
                                 .overlay(
                                     Image(systemName: "person.fill")
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(selectedGroup == nil && selectedGroupMember == nil ? .blue : .gray)
                                         .font(.system(size: 30))
                                 )
                             
                             Text(currentUser.name)
                                 .font(.headline)
+                                .foregroundColor(selectedGroup == nil && selectedGroupMember == nil ? .blue : .primary)
                         }
                         .padding(.top, 40)
                         .padding(.bottom, 20)
+                        .onTapGesture {
+                            onResetSelect()
+                            onClose()
+                        }
                     }
                     
                     Text("表示データの切り替え")
@@ -48,11 +57,11 @@ struct DrawerView: View {
                                     }) {
                                         HStack {
                                             Image(systemName: group.iconName)
-                                                .foregroundColor(.primary)
+                                                .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
                                                 .frame(width: 24)
                                             
                                             Text(group.name)
-                                                .foregroundColor(.primary)
+                                                .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
                                             
                                             Spacer()
                                             
@@ -61,9 +70,36 @@ struct DrawerView: View {
                                                 .font(.system(size: 14))
                                         }
                                     }
+                                    .onTapGesture {
+                                        onGroupSelect(group)
+                                        if !expandedGroupIds.contains(group.id) {
+                                            toggleGroup(group.id)
+                                        }
+                                        onClose()
+                                    }
                                     
                                     if expandedGroupIds.contains(group.id) {
                                         VStack(alignment: .leading, spacing: 12) {
+                                            Button(action: {
+                                                onGroupSelect(group)
+                                                onClose()
+                                            }) {
+                                                HStack(spacing: 12) {
+                                                    Circle()
+                                                        .fill(selectedGroup?.id == group.id && selectedGroupMember == nil ? Color.blue.opacity(0.2) : Color.gray.opacity(0.3))
+                                                        .frame(width: 36, height: 36)
+                                                        .overlay(
+                                                            Image(systemName: "person.3.fill")
+                                                                .foregroundColor(selectedGroup?.id == group.id && selectedGroupMember == nil ? .blue : .gray)
+                                                                .font(.system(size: 18))
+                                                        )
+                                                    
+                                                    Text("全員")
+                                                        .foregroundColor(selectedGroup?.id == group.id && selectedGroupMember == nil ? .blue : .primary)
+                                                }
+                                            }
+                                            .padding(.leading, 32)
+
                                             ForEach(group.users, id: \.id) { user in
                                                 Button(action: {
                                                     onUserSelect(user)
@@ -71,16 +107,16 @@ struct DrawerView: View {
                                                 }) {
                                                     HStack(spacing: 12) {
                                                         Circle()
-                                                            .fill(Color.gray.opacity(0.3))
+                                                            .fill(selectedGroupMember?.id == user.id ? Color.blue.opacity(0.2) : Color.gray.opacity(0.3))
                                                             .frame(width: 36, height: 36)
                                                             .overlay(
                                                                 Image(systemName: "person.fill")
-                                                                    .foregroundColor(.gray)
+                                                                    .foregroundColor(selectedGroupMember?.id == user.id ? .blue : .gray)
                                                                     .font(.system(size: 18))
                                                             )
                                                         
                                                         Text(user.name)
-                                                            .foregroundColor(.primary)
+                                                            .foregroundColor(selectedGroupMember?.id == user.id ? .blue : .primary)
                                                     }
                                                 }
                                                 .padding(.leading, 32)

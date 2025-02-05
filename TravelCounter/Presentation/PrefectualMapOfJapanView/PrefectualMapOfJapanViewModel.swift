@@ -8,31 +8,20 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var isShowingDetailMap: Bool = false
     @Published var currentUser: UserProfile?
     @Published var userGroups: [UserGroup] = []
+    @Published var selectedGroup: UserGroup?
+    @Published var selectedGroupMember: UserProfile?
     
-    // モックデータ: 地域ごとの訪問回数
-    private var regionVisitCounts: [AMRegion: Int] = [
-        .hokkaido: 2,
-        .tohoku: 3,
-        .kanto: 10,
-        .chubu: 1,
-        .kinki: 5,
-        .chugoku: 0,
-        .shikoku: 1,
-        .kyushu: 4
-    ]
-    
-    // モックデータ: 都道府県ごとの訪問回数
-    private var prefectureVisitCounts: [AMPrefecture: Int] = [
-        .hokkaido: 2,
-        .tokyo: 5,
-        .osaka: 3,
-        .kyoto: 2,
-        .fukuoka: 1,
-        .okinawa: 3
-    ]
+    // モックデータ: ユーザーごとの地域訪問回数
+    private var userRegionVisitCounts: [Int: [AMRegion: Int]] = [:]
+    // モックデータ: ユーザーごとの都道府県訪問回数
+    private var userPrefectureVisitCounts: [Int: [AMPrefecture: Int]] = [:]
     
     init() {
-        // モックデータの設定
+        setupMockData()
+    }
+    
+    private func setupMockData() {
+        // 現在のユーザーのデータ
         currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
         
         // グループとユーザーのモックデータ
@@ -55,38 +44,74 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
                     UserProfile(id: 4, name: "友達A", imageURL: nil),
                     UserProfile(id: 5, name: "友達B", imageURL: nil)
                 ]
-            ),
-            UserGroup(
-                id: 3,
-                name: "同僚",
-                iconName: "briefcase.fill",
-                users: [
-                    UserProfile(id: 6, name: "同僚A", imageURL: nil),
-                    UserProfile(id: 7, name: "同僚B", imageURL: nil),
-                    UserProfile(id: 8, name: "同僚C", imageURL: nil)
-                ]
             )
+        ]
+        
+        // ユーザーごとの訪問回数データ
+        userRegionVisitCounts = [
+            0: [.hokkaido: 2, .tohoku: 3, .kanto: 10],  // 現在のユーザー
+            1: [.kanto: 5, .kinki: 3],                  // 父
+            2: [.tohoku: 2, .kanto: 4, .kinki: 2],      // 母
+            3: [.kanto: 3, .chubu: 2],                  // 兄
+            4: [.kanto: 6, .kinki: 4],                  // 友達A
+            5: [.tohoku: 1, .kanto: 2]                  // 友達B
+        ]
+        
+        userPrefectureVisitCounts = [
+            0: [.tokyo: 5, .osaka: 3],      // 現在のユーザー
+            1: [.tokyo: 3, .kyoto: 2],      // 父
+            2: [.tokyo: 2, .osaka: 1],      // 母
+            3: [.tokyo: 4, .kanagawa: 2],   // 兄
+            4: [.tokyo: 3, .osaka: 2],      // 友達A
+            5: [.miyagi: 1, .tokyo: 1]      // 友達B
         ]
     }
     
-    func selectRegion(_ region: AMRegion) {
-        selectedRegion = region
-    }
-    
-    func deselectRegion(_ region: AMRegion) {
-        if selectedRegion == region {
-            selectedRegion = nil
+    // 選択されたグループの合計訪問回数を取得
+    func getGroupVisitCount(for region: AMRegion) -> Int {
+        guard let group = selectedGroup else { return getVisitCount(for: region) }
+        
+        return group.users.reduce(0) { total, user in
+            total + (userRegionVisitCounts[user.id]?[region] ?? 0)
         }
     }
     
-    func selectPrefecture(_ prefecture: AMPrefecture) {
-        selectedPrefecture = prefecture
+    func getGroupVisitCount(for prefecture: AMPrefecture) -> Int {
+        guard let group = selectedGroup else { return getVisitCount(for: prefecture) }
+        
+        return group.users.reduce(0) { total, user in
+            total + (userPrefectureVisitCounts[user.id]?[prefecture] ?? 0)
+        }
     }
     
-    func deselectPrefecture(_ prefecture: AMPrefecture) {
-        if selectedPrefecture == prefecture {
-            selectedPrefecture = nil
+    // 個別ユーザーの訪問回数を取得
+    func getVisitCount(for region: AMRegion) -> Int {
+        if let member = selectedGroupMember {
+            return userRegionVisitCounts[member.id]?[region] ?? 0
         }
+        return userRegionVisitCounts[0]?[region] ?? 0  // デフォルトは現在のユーザー
+    }
+    
+    func getVisitCount(for prefecture: AMPrefecture) -> Int {
+        if let member = selectedGroupMember {
+            return userPrefectureVisitCounts[member.id]?[prefecture] ?? 0
+        }
+        return userPrefectureVisitCounts[0]?[prefecture] ?? 0  // デフォルトは現在のユーザー
+    }
+    
+    // グループまたはユーザーの選択を更新
+    func selectGroup(_ group: UserGroup) {
+        selectedGroup = group
+        selectedGroupMember = nil  // グループ選択時はメンバー選択をリセット
+    }
+    
+    func selectGroupMember(_ member: UserProfile) {
+        selectedGroupMember = member
+    }
+    
+    func resetSelection() {
+        selectedGroup = nil
+        selectedGroupMember = nil
     }
     
     func toggleMapType() {
@@ -94,15 +119,6 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         // 地図タイプを切り替えるときに選択状態をリセット
         selectedRegion = nil
         selectedPrefecture = nil
-    }
-    
-    // 訪問回数を取得
-    func getVisitCount(for region: AMRegion) -> Int {
-        return regionVisitCounts[region] ?? 0
-    }
-    
-    func getVisitCount(for prefecture: AMPrefecture) -> Int {
-        return prefectureVisitCounts[prefecture] ?? 0
     }
     
     func constrainOffset(_ offset: CGSize, in geometrySize: CGSize, scale: CGFloat) -> CGSize {
