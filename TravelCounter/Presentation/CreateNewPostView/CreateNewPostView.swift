@@ -70,8 +70,24 @@ struct CreateNewPostView: View {
                             viewModel.toggleGroup(group.id)
                         }) {
                             HStack {
-                                Image(systemName: group.iconName)
-                                    .foregroundColor(.primary)
+                                if let imageURL = group.imageURL {
+                                    AsyncImage(url: URL(string: imageURL)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 24, height: 24)
+                                            .clipShape(Circle())
+                                    } placeholder: {
+                                        Image(systemName: "person.3.fill")
+                                            .foregroundColor(.primary)
+                                            .frame(width: 24)
+                                    }
+                                } else {
+                                    Image(systemName: "person.3.fill")
+                                        .foregroundColor(.primary)
+                                        .frame(width: 24)
+                                }
+                                
                                 Text(group.name)
                                 Spacer()
                                 if viewModel.selectedGroups.contains(group.id) {

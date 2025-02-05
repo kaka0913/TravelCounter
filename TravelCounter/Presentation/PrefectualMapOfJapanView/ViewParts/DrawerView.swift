@@ -90,14 +90,27 @@ struct DrawerView: View {
                                         toggleGroup(group.id)
                                     }) {
                                         HStack {
-                                            Image(systemName: group.iconName)
-                                                .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
-                                                .frame(width: 24)
+                                            if let imageURL = group.imageURL {
+                                                AsyncImage(url: URL(string: imageURL)) { image in
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                        .frame(width: 24, height: 24)
+                                                        .clipShape(Circle())
+                                                } placeholder: {
+                                                    Image(systemName: "person.3.fill")
+                                                        .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
+                                                        .frame(width: 24)
+                                                }
+                                            } else {
+                                                Image(systemName: "person.3.fill")
+                                                    .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
+                                                    .frame(width: 24)
+                                            }
                                             
                                             Text(group.name)
                                                 .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
-                                                
-
+                                            
                                             Spacer()
                                             
                                             Image(systemName: expandedGroupIds.contains(group.id) ? "chevron.down" : "chevron.right")

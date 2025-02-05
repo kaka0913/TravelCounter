@@ -29,7 +29,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
             UserGroup(
                 id: 1,
                 name: "家族",
-                iconName: "house.fill",
+                imageURL: "house.fill",
                 users: [
                     UserProfile(id: 1, name: "父", imageURL: nil),
                     UserProfile(id: 2, name: "母", imageURL: nil),
@@ -40,7 +40,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
             UserGroup(
                 id: 2,
                 name: "友達",
-                iconName: "person.2.fill",
+                imageURL: "person.2.fill",
                 users: [
                     UserProfile(id: 4, name: "友達A", imageURL: nil),
                     UserProfile(id: 5, name: "友達B", imageURL: nil)

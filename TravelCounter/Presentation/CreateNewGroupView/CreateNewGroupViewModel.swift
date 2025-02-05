@@ -9,14 +9,14 @@ import SwiftUI
 
 class CreateNewGroupViewModel: ObservableObject {
     @Published var groupName: String = ""
-    @Published var iconImage: UIImage?
+    @Published var selectedImage: UIImage?
     @Published var password: String = ""
     @Published var showingAlert = false
     @Published var alertMessage = ""
     @Published var showingImagePicker = false
+    @Published var isLoading = false
 
     func createGroup() {
-        // バリデーション
         guard !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             alertMessage = "グループ名を入力してください"
             showingAlert = true
@@ -29,13 +29,30 @@ class CreateNewGroupViewModel: ObservableObject {
             return
         }
         
-        guard iconImage != nil else {
-            alertMessage = "アイコン画像を選択してください"
+        guard selectedImage != nil else {
+            alertMessage = "グループ画像を選択してください"
             showingAlert = true
             return
         }
+
+        isLoading = true
         
-        // TODO: グループの保存処理
-        print("Group created with name: \(groupName), password: \(password)")
+        Task {
+            do {
+                if let image = selectedImage {
+                    // TODO: グループの保存処理
+                    print("Group created with name: \(groupName), password: \(password)")
+                }
+                await MainActor.run {
+                    isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    alertMessage = "グループの作成に失敗しました"
+                    showingAlert = true
+                }
+            }
+        }
     }
 }

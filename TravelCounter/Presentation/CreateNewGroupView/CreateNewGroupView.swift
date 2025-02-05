@@ -22,27 +22,27 @@ struct CreateNewGroupView: View {
                         .textContentType(.newPassword)
                 }
                 
-                Section(header: Text("アイコン")) {
+                Section(header: Text("グループ画像")) {
                     HStack {
                         Spacer()
                         VStack {
-                            if let image = viewModel.iconImage {
+                            if let image = viewModel.selectedImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipShape(Circle())
+                                    .frame(width: 200, height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
                                     .overlay(
-                                        Circle()
+                                        RoundedRectangle(cornerRadius: 12)
                                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                     )
                             } else {
-                                Circle()
+                                RoundedRectangle(cornerRadius: 12)
                                     .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 100, height: 100)
+                                    .frame(width: 200, height: 200)
                                     .overlay(
-                                        Image(systemName: "camera.fill")
-                                            .font(.system(size: 30))
+                                        Image(systemName: "photo.fill")
+                                            .font(.system(size: 40))
                                             .foregroundColor(.gray)
                                     )
                             }
@@ -50,7 +50,7 @@ struct CreateNewGroupView: View {
                             Button(action: {
                                 viewModel.showingImagePicker = true
                             }) {
-                                Text(viewModel.iconImage == nil ? "画像を選択" : "画像を変更")
+                                Text(viewModel.selectedImage == nil ? "画像を選択" : "画像を変更")
                                     .padding(.top, 8)
                             }
                         }
@@ -72,10 +72,19 @@ struct CreateNewGroupView: View {
                     Button("作成") {
                         viewModel.createGroup()
                     }
+                    .disabled(viewModel.isLoading)
+                }
+            }
+            .overlay {
+                if viewModel.isLoading {
+                    ProgressView("作成中...")
+                        .padding()
+                        .background(Color.white.opacity(0.8))
+                        .cornerRadius(8)
                 }
             }
             .sheet(isPresented: $viewModel.showingImagePicker) {
-                ImagePicker(image: $viewModel.iconImage)
+                ImagePicker(image: $viewModel.selectedImage)
             }
             .alert("エラー", isPresented: $viewModel.showingAlert) {
                 Button("OK") {}
