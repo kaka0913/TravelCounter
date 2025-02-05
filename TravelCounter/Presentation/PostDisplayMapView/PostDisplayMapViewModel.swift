@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import AMJpnMap
 
 class PostDisplayMapViewModel: ObservableObject {
     @Published var region = MKCoordinateRegion(
@@ -17,6 +18,7 @@ class PostDisplayMapViewModel: ObservableObject {
     @Published var visiblePrefectures: Set<String> = []
     @Published var selectedPost: Post? = nil
     @Published var showingPostDetail = false
+    @Published var selectedPrefecture: AMPrefecture?
     
     private let geocoder = CLGeocoder()
     private var lastUpdateTime: Date = Date()
@@ -42,6 +44,16 @@ class PostDisplayMapViewModel: ObservableObject {
                  date: dateFormatter.date(from: "2025-02-01T18:30:00Z") ?? Date(),
                  coordinate: CLLocationCoordinate2D(latitude: 35.6912, longitude: 139.7771))
         ]
+    }
+    
+    func focusOnPrefecture(_ prefecture: AMPrefecture) {
+        selectedPrefecture = prefecture
+        let location = prefecture.location
+        
+        region = MKCoordinateRegion(
+            center: location.coordinate,
+            span: MKCoordinateSpan(latitudeDelta: location.zoomLevel, longitudeDelta: location.zoomLevel)
+        )
     }
     
     func scheduleVisiblePrefecturesUpdate(for region: MKCoordinateRegion) {

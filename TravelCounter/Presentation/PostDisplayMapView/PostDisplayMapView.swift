@@ -7,10 +7,16 @@
 
 import SwiftUI
 import MapKit
+import AMJpnMap
 
 struct PostDisplayMapView: View {
+    let selectedPrefecture: AMPrefecture?
     @StateObject private var viewModel = PostDisplayMapViewModel()
     @State private var mapType: MKMapType = .standard
+    
+    init(selectedPrefecture: AMPrefecture? = nil) {
+        self.selectedPrefecture = selectedPrefecture
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -28,6 +34,9 @@ struct PostDisplayMapView: View {
                         }
                 }
                 .onAppear {
+                    if let prefecture = selectedPrefecture {
+                        viewModel.focusOnPrefecture(prefecture)
+                    }
                     viewModel.updateVisiblePrefectures(for: viewModel.region)
                 }
                 .onChange(of: viewModel.region.center.latitude) { oldValue, newValue in
@@ -51,5 +60,6 @@ struct PostDisplayMapView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
+        .navigationTitle(Array(viewModel.visiblePrefectures).first ?? "地図")
     }
 }
