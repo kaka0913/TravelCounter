@@ -11,6 +11,8 @@ struct DrawerView: View {
     let onUserSelect: (UserProfile) -> Void
     let onGroupSelect: (UserGroup) -> Void
     let onResetSelect: () -> Void
+    let onCreateGroup: () -> Void
+    let onCreatePost: () -> Void
     
     @State private var expandedGroupIds: Set<Int> = []
     
@@ -41,12 +43,44 @@ struct DrawerView: View {
                             onResetSelect()
                             onClose()
                         }
+                        
+                        HStack(spacing: 16) {
+                            Button(action: {
+                                onCreatePost()
+                                onClose()
+                            }) {
+                                HStack {
+                                    Image(systemName: "square.and.pencil")
+                                        .font(.system(size: 16))
+                                    Text("新規投稿")
+                                        .font(.subheadline)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color.blue)
+                                .cornerRadius(8)
+                            }
+                            
+                            Button(action: {
+                                onCreateGroup()
+                                onClose()
+                            }) {
+                                HStack {
+                                    Image(systemName: "person.3.fill")
+                                        .font(.system(size: 12))
+                                    Text("団体作成")
+                                        .font(.subheadline)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Color.blue)
+                                .cornerRadius(8)
+                            }
+                        }
+                        .padding(.bottom, 16)
                     }
-                    
-                    Text("表示データの切り替え")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 8)
                     
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
@@ -62,7 +96,8 @@ struct DrawerView: View {
                                             
                                             Text(group.name)
                                                 .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
-                                            
+                                                
+
                                             Spacer()
                                             
                                             Image(systemName: expandedGroupIds.contains(group.id) ? "chevron.down" : "chevron.right")
@@ -80,6 +115,16 @@ struct DrawerView: View {
                                     
                                     if expandedGroupIds.contains(group.id) {
                                         VStack(alignment: .leading, spacing: 12) {
+                                            if expandedGroupIds.contains(group.id) {
+                                                HStack(spacing: 4) {
+                                                    Image(systemName: "key.fill")
+                                                        .font(.system(size: 12))
+                                                        .foregroundColor(.gray)
+                                                    Text("パスワード: \(group.password)")
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
+                                                }
+                                            }
                                             Button(action: {
                                                 onGroupSelect(group)
                                                 onClose()

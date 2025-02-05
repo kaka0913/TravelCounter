@@ -34,7 +34,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
                     UserProfile(id: 1, name: "父", imageURL: nil),
                     UserProfile(id: 2, name: "母", imageURL: nil),
                     UserProfile(id: 3, name: "兄", imageURL: nil)
-                ]
+                ],
+                password: "family2024"
             ),
             UserGroup(
                 id: 2,
@@ -43,7 +44,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
                 users: [
                     UserProfile(id: 4, name: "友達A", imageURL: nil),
                     UserProfile(id: 5, name: "友達B", imageURL: nil)
-                ]
+                ],
+                password: "friends2024"
             )
         ]
         

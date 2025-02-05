@@ -212,6 +212,14 @@ struct PrefectualMapOfJapanView: View {
                     },
                     onResetSelect: {
                         viewModel.resetSelection()
+                    },
+                    onCreateGroup: {
+                        // TODO: グループ作成画面への遷移
+                        print("Create new group")
+                    },
+                    onCreatePost: {
+                        // TODO: 新規投稿画面への遷移
+                        print("Create new post")
                     }
                 )
                 .zIndex(1)
