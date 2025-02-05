@@ -9,6 +9,7 @@ struct PrefectualMapOfJapanView: View {
     @State private var lastMapOffset: CGSize = .zero
     @State private var magnificationScale: CGFloat = 1.0
     @State private var showingCreateNewPost = false
+    @State private var showingCreateNewGroup = false
     
     var body: some View {
         NavigationView {
@@ -215,8 +216,7 @@ struct PrefectualMapOfJapanView: View {
                         viewModel.resetSelection()
                     },
                     onCreateGroup: {
-                        // TODO: グループ作成画面への遷移
-                        print("Create new group")
+                        showingCreateNewGroup = true
                     },
                     onCreatePost: {
                         showingCreateNewPost = true
@@ -227,6 +227,9 @@ struct PrefectualMapOfJapanView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showingCreateNewPost) {
                 CreateNewPostView()
+            }
+            .sheet(isPresented: $showingCreateNewGroup) {
+                CreateNewGroupView()
             }
         }
     }
