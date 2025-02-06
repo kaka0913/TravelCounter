@@ -10,6 +10,7 @@ import PhotosUI
 
 struct ProfileSettingView: View {
     @StateObject private var viewModel = ProfileSettingViewModel()
+    let onComplete: () -> Void
     
     var body: some View {
         NavigationView {
@@ -47,9 +48,11 @@ struct ProfileSettingView: View {
                         .textContentType(.username)
                 }
                 
-                Button("完了する") {
+                Button("完了") {
                     viewModel.saveProfile()
+                    onComplete()
                 }
+                .disabled(viewModel.userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
             .navigationTitle("プロフィール設定")
             .sheet(isPresented: $viewModel.isImagePickerPresented) {

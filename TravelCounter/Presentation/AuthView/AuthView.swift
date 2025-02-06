@@ -14,22 +14,34 @@ struct AuthView: View {
     @StateObject var viewModel = AuthViewModel()
     @State private var email = ""
     @State private var password = ""
-    @State private var showAlert = false
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 25) {
+            Image("Painteer")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 200, height: 200)
+                .padding(.top, -20)
+            
             Text("Painteer")
                 .font(.largeTitle)
                 .fontWeight(.bold)
             
+            Text("旅の思い出を共有しよう")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            
             // メール・パスワード入力フォーム
-            VStack(spacing: 15) {
+            VStack(spacing: 20) {
                 TextField("メールアドレス", text: $email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
                 
                 SecureField("パスワード", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textContentType(.password)
             }
             .padding(.horizontal)
             
@@ -72,6 +84,7 @@ struct AuthView: View {
             
             // Googleログインボタン
             GoogleSignInButton(action: viewModel.signInWithGoogle)
+                .padding(.horizontal, 20)
         }
         .padding()
         .alert(isPresented: $viewModel.showError) {
