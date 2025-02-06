@@ -66,9 +66,9 @@ struct DrawerView: View {
                                 onCreateGroup()
                                 onClose()
                             }) {
-                                HStack {
+                                HStack{
                                     Image(systemName: "person.3.fill")
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 10))
                                     Text("団体作成")
                                         .font(.subheadline)
                                 }
