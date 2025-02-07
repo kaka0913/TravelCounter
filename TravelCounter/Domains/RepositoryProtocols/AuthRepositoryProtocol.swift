@@ -1,0 +1,13 @@
+//
+//  AuthRepositoryProtocol.swift
+//  TravelCounter
+//
+//  Created by 株丹優一郎 on 2025/02/07.
+//
+
+import Foundation
+
+protocol AuthRepositoryProtocol {
+    func signup(userName: String, icon: String, authId: String) async throws -> Int
+    func signin(authId: String) async throws -> Int
+}
