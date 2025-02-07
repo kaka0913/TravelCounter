@@ -83,8 +83,14 @@ struct AuthView: View {
             .padding()
             
             // Googleログインボタン
-            GoogleSignInButton(action: viewModel.signInWithGoogle)
-                .padding(.horizontal, 20)
+            GoogleSignInButton {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                      let rootViewController = windowScene.windows.first?.rootViewController else {
+                    return
+                }
+                viewModel.signInWithGoogle(presenting: rootViewController)
+            }
+            .padding(.horizontal, 20)
         }
         .padding()
         .alert(isPresented: $viewModel.showError) {
