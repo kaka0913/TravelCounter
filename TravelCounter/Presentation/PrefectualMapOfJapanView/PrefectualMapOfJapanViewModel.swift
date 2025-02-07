@@ -10,14 +10,43 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var userGroups: [UserGroup] = []
     @Published var selectedGroup: UserGroup?
     @Published var selectedGroupMember: UserProfile?
+    @Published var userProfile: Profile?
+    @Published var isLoadingProfile = false
+    @Published var errorMessage: String?
     
     // モックデータ: ユーザーごとの地域訪問回数
     private var userRegionVisitCounts: [Int: [AMRegion: Int]] = [:]
     // モックデータ: ユーザーごとの都道府県訪問回数
     private var userPrefectureVisitCounts: [Int: [AMPrefecture: Int]] = [:]
     
-    init() {
+    private let getProfileUseCase: GetProfileUseCase
+    
+    init(getProfileUseCase: GetProfileUseCase = GetProfileUseCase()) {
+        self.getProfileUseCase = getProfileUseCase
         setupMockData()
+        fetchUserProfile()
+    }
+    
+    private func fetchUserProfile() {
+        guard let userId = currentUser?.id else { return }
+        
+        isLoadingProfile = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                let profile = try await getProfileUseCase.execute(userId: userId)
+                await MainActor.run {
+                    self.userProfile = profile
+                    self.isLoadingProfile = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "プロフィールの取得に失敗しました"
+                    self.isLoadingProfile = false
+                }
+            }
+        }
     }
     
     private func setupMockData() {

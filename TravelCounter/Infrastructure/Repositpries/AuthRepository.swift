@@ -22,4 +22,15 @@ class AuthRepository: AuthRepositoryProtocol {
         let response = try await apiClient.call(request: request)
         return response.userId
     }
+    
+    func getProfile(userId: Int) async throws -> Profile {
+        let request = GetProfileRequest(userId: userId)
+        let response = try await apiClient.call(request: request)
+        return Profile(
+            userName: response.userName,
+            icon: response.icon,
+            createdAt: response.createdAt,
+            updatedAt: response.updatedAt
+        )
+    }
 }
