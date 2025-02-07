@@ -17,9 +17,17 @@ struct PostAnnotation: View {
                 .frame(width: 36, height: 36)
                 .shadow(radius: 2)
             
-            Image(systemName: "photo")
-                .foregroundColor(.blue)
-                .imageScale(.medium)
+            if let image = UIImage(named: post.image) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 32, height: 32)
+                    .clipShape(Circle())
+            } else {
+                Image(systemName: "photo")
+                    .foregroundColor(.blue)
+                    .imageScale(.medium)
+            }
         }
     }
 }
