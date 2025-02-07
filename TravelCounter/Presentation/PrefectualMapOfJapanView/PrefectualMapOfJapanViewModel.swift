@@ -1,6 +1,7 @@
 import Foundation
 import AMJpnMap
 import UIKit
+import SwiftUI
 
 class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var selectedRegion: AMRegion?
@@ -13,6 +14,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var userProfile: Profile?
     @Published var isLoadingProfile = false
     @Published var errorMessage: String?
+    
+    @AppStorage("userId") private var userId: Int = 0
     
     // モックデータ: ユーザーごとの地域訪問回数
     private var userRegionVisitCounts: [Int: [AMRegion: Int]] = [:]
@@ -28,8 +31,6 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     }
     
     private func fetchUserProfile() {
-        guard let userId = currentUser?.id else { return }
-        
         isLoadingProfile = true
         errorMessage = nil
         
@@ -38,6 +39,11 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
                 let profile = try await getProfileUseCase.execute(userId: userId)
                 await MainActor.run {
                     self.userProfile = profile
+                    self.currentUser = UserProfile(
+                        id: userId,
+                        name: profile.userName,
+                        imageURL: URL(string: profile.icon)
+                    )
                     self.isLoadingProfile = false
                 }
             } catch {
@@ -50,9 +56,6 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     }
     
     private func setupMockData() {
-        // 現在のユーザーのデータ
-        currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
-        
         // グループとユーザーのモックデータ
         userGroups = [
             UserGroup(

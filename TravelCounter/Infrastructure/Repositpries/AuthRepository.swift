@@ -24,6 +24,12 @@ class AuthRepository: AuthRepositoryProtocol {
     }
     
     func getProfile(userId: Int) async throws -> Profile {
+        //TODO: APIを呼び出すようにして、後で消す
+        #if DEBUG
+        // 開発時はモックデータを使用
+        return try await Self.getMockProfile(userId: userId)
+        #else
+        // 本番環境では実際のAPIを呼び出し
         let request = GetProfileRequest(userId: userId)
         let response = try await apiClient.call(request: request)
         return Profile(
@@ -31,6 +37,20 @@ class AuthRepository: AuthRepositoryProtocol {
             icon: response.icon,
             createdAt: response.createdAt,
             updatedAt: response.updatedAt
+        )
+        #endif
+    }
+}
+
+// MARK: - Mock Data
+extension AuthRepository {
+    static func getMockProfile(userId: Int) async throws -> Profile {
+        // 開発用の固定データを返す
+        return Profile(
+            userName: "テストユーザー",
+            icon: "https://example.com/test-user.jpg",
+            createdAt: Date(timeIntervalSince1970: 1706745600), // 2024-02-01
+            updatedAt: Date()
         )
     }
 }
