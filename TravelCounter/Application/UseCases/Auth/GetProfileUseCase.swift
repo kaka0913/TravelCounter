@@ -7,7 +7,7 @@ final class GetProfileUseCase {
         self.authRepository = authRepository
     }
     
-    func execute(userId: Int) async throws -> Profile {
+    func execute(userId: Int) async throws -> UserProfile {
         return try await authRepository.getProfile(userId: userId)
     }
 } 

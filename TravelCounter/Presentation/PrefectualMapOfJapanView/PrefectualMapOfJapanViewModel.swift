@@ -11,7 +11,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var userGroups: [UserGroup] = []
     @Published var selectedGroup: UserGroup?
     @Published var selectedGroupMember: UserProfile?
-    @Published var userProfile: Profile?
+    @Published var userProfile: UserProfile?
     @Published var isLoadingProfile = false
     @Published var errorMessage: String?
     
@@ -39,11 +39,7 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
                 let profile = try await getProfileUseCase.execute(userId: userId)
                 await MainActor.run {
                     self.userProfile = profile
-                    self.currentUser = UserProfile(
-                        id: userId,
-                        name: profile.userName,
-                        imageURL: URL(string: profile.icon)
-                    )
+                    self.currentUser = profile
                     self.isLoadingProfile = false
                 }
             } catch {
