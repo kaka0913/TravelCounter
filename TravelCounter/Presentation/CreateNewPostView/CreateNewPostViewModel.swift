@@ -21,43 +21,42 @@ class CreateNewPostViewModel: ObservableObject {
     @Published var selectedPrefectureId: Int?
     @Published var showingLocationSearch = false
     @Published var isCreating = false
+    @Published var isLoadingGroups = false
+    @Published var userGroups: [UserGroup] = []
+    
+    @AppStorage("userId") private var userId: Int = 0
     
     private let createPostUseCase: CreatePostUseCase
+    private let getUserGroupsUseCase: GetUserGroupsUseCase
     private let geocoder = CLGeocoder()
-    private(set) var currentUserId: Int
-    private(set) var userGroups: [UserGroup]
     
-    init(createPostUseCase: CreatePostUseCase = CreatePostUseCase()) {
+    init(
+        createPostUseCase: CreatePostUseCase = CreatePostUseCase(),
+        getUserGroupsUseCase: GetUserGroupsUseCase = GetUserGroupsUseCase()
+    ) {
         self.createPostUseCase = createPostUseCase
+        self.getUserGroupsUseCase = getUserGroupsUseCase
+        fetchUserGroups()
+    }
+    
+    private func fetchUserGroups() {
+        isLoadingGroups = true
         
-        // 現在のユーザーのデータを取得
-        let currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
-        self.currentUserId = currentUser.id
-        
-        // ユーザーが所属しているグループを取得
-        self.userGroups = [
-            UserGroup(
-                id: 1,
-                name: "家族",
-                imageURL: "house.fill",
-                users: [
-                    UserProfile(id: 1, name: "父", imageURL: nil),
-                    UserProfile(id: 2, name: "母", imageURL: nil),
-                    UserProfile(id: 3, name: "兄", imageURL: nil)
-                ],
-                password: "family2024"
-            ),
-            UserGroup(
-                id: 2,
-                name: "友達",
-                imageURL: "person.2.fill",
-                users: [
-                    UserProfile(id: 4, name: "友達A", imageURL: nil),
-                    UserProfile(id: 5, name: "友達B", imageURL: nil)
-                ],
-                password: "friends2024"
-            )
-        ]
+        Task {
+            do {
+                let groups = try await getUserGroupsUseCase.execute(userId: userId)
+                await MainActor.run {
+                    self.userGroups = groups
+                    self.isLoadingGroups = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.alertMessage = "グループの取得に失敗しました"
+                    self.showingAlert = true
+                    self.isLoadingGroups = false
+                }
+            }
+        }
     }
     
     func toggleGroup(_ groupId: Int) {
@@ -143,7 +142,7 @@ class CreateNewPostViewModel: ObservableObject {
                 image: imageBase64,
                 comment: comment,
                 coordinate: location,
-                userId: currentUserId,
+                userId: userId,
                 prefectureId: prefectureId,
                 groupIds: Array(selectedGroups)
             )
