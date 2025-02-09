@@ -16,30 +16,33 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var isLoadingGroups = false
     @Published var isLoadingGroupMembers = false
     @Published var errorMessage: String?
+    @Published var prefectureCounts: [String: Int] = [:]
+    @Published var regionCounts: [String: Int] = [:]
     
     @AppStorage("userId") private var userId: Int = 0
-    
-    // モックデータ: ユーザーごとの地域訪問回数
-    private var userRegionVisitCounts: [Int: [AMRegion: Int]] = [:]
-    // モックデータ: ユーザーごとの都道府県訪問回数
-    private var userPrefectureVisitCounts: [Int: [AMPrefecture: Int]] = [:]
     
     private let getProfileUseCase: GetProfileUseCase
     private let getUserGroupsUseCase: GetUserGroupsUseCase
     private let getGroupMembersUseCase: GetGroupMembersUseCase
+    private let getPrefectureCountsUseCase: GetPrefectureCountsUseCase
+    private let getRegionCountsUseCase: GetRegionCountsUseCase
     
     init(
         getProfileUseCase: GetProfileUseCase = GetProfileUseCase(),
         getUserGroupsUseCase: GetUserGroupsUseCase = GetUserGroupsUseCase(),
-        getGroupMembersUseCase: GetGroupMembersUseCase = GetGroupMembersUseCase()
+        getGroupMembersUseCase: GetGroupMembersUseCase = GetGroupMembersUseCase(),
+        getPrefectureCountsUseCase: GetPrefectureCountsUseCase = GetPrefectureCountsUseCase(),
+        getRegionCountsUseCase: GetRegionCountsUseCase = GetRegionCountsUseCase()
     ) {
         self.getProfileUseCase = getProfileUseCase
         self.getUserGroupsUseCase = getUserGroupsUseCase
         self.getGroupMembersUseCase = getGroupMembersUseCase
-        setupMockData()
+        self.getPrefectureCountsUseCase = getPrefectureCountsUseCase
+        self.getRegionCountsUseCase = getRegionCountsUseCase
         setupNotifications()
         fetchUserProfile()
         fetchUserGroups()
+        fetchVisitCounts()
     }
     
     private func setupNotifications() {
@@ -154,57 +157,57 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         }
     }
     
-    private func setupMockData() {
-        // ユーザーごとの訪問回数データ
-        userRegionVisitCounts = [
-            0: [.hokkaido: 2, .tohoku: 3, .kanto: 10],  // 現在のユーザー
-            1: [.kanto: 5, .kinki: 3],                  // 父
-            2: [.tohoku: 2, .kanto: 4, .kinki: 2],      // 母
-            3: [.kanto: 3, .chubu: 2],                  // 兄
-            4: [.kanto: 6, .kinki: 4],                  // 友達A
-            5: [.tohoku: 1, .kanto: 2]                  // 友達B
-        ]
-        
-        userPrefectureVisitCounts = [
-            0: [.tokyo: 5, .osaka: 3],      // 現在のユーザー
-            1: [.tokyo: 3, .kyoto: 2],      // 父
-            2: [.tokyo: 2, .osaka: 1],      // 母
-            3: [.tokyo: 4, .kanagawa: 2],   // 兄
-            4: [.tokyo: 3, .osaka: 2],      // 友達A
-            5: [.miyagi: 1, .tokyo: 1]      // 友達B
-        ]
+    private func fetchVisitCounts() {
+        Task {
+            await fetchPrefectureCounts()
+            await fetchRegionCounts()
+        }
+    }
+    
+    private func fetchPrefectureCounts() async {
+        do {
+            let groupIds = selectedGroup.map { [$0.id] } ?? []
+            let counts = try await getPrefectureCountsUseCase.execute(groupIds: groupIds)
+            await MainActor.run {
+                self.prefectureCounts = Dictionary(uniqueKeysWithValues: counts.map { ($0.prefectureName, $0.count) })
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "都道府県別訪問回数の取得に失敗しました"
+            }
+        }
+    }
+    
+    private func fetchRegionCounts() async {
+        do {
+            let groupIds = selectedGroup.map { [$0.id] } ?? []
+            let counts = try await getRegionCountsUseCase.execute(groupIds: groupIds)
+            await MainActor.run {
+                self.regionCounts = Dictionary(uniqueKeysWithValues: counts.map { ($0.regionName, $0.count) })
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "地域別訪問回数の取得に失敗しました"
+            }
+        }
     }
     
     // 選択されたグループの合計訪問回数を取得
     func getGroupVisitCount(for region: AMRegion) -> Int {
-        guard let group = selectedGroup else { return getVisitCount(for: region) }
-        
-        return group.users.reduce(0) { total, user in
-            total + (userRegionVisitCounts[user.id]?[region] ?? 0)
-        }
+        return regionCounts[region.name] ?? 0
     }
     
     func getGroupVisitCount(for prefecture: AMPrefecture) -> Int {
-        guard let group = selectedGroup else { return getVisitCount(for: prefecture) }
-        
-        return group.users.reduce(0) { total, user in
-            total + (userPrefectureVisitCounts[user.id]?[prefecture] ?? 0)
-        }
+        return prefectureCounts[prefecture.name] ?? 0
     }
     
     // 個別ユーザーの訪問回数を取得
     func getVisitCount(for region: AMRegion) -> Int {
-        if let member = selectedGroupMember {
-            return userRegionVisitCounts[member.id]?[region] ?? 0
-        }
-        return userRegionVisitCounts[0]?[region] ?? 0  // デフォルトは現在のユーザー
+        return regionCounts[region.name] ?? 0
     }
     
     func getVisitCount(for prefecture: AMPrefecture) -> Int {
-        if let member = selectedGroupMember {
-            return userPrefectureVisitCounts[member.id]?[prefecture] ?? 0
-        }
-        return userPrefectureVisitCounts[0]?[prefecture] ?? 0  // デフォルトは現在のユーザー
+        return prefectureCounts[prefecture.name] ?? 0
     }
     
     // グループまたはユーザーの選択を更新
