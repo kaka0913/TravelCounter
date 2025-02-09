@@ -69,7 +69,7 @@ struct DrawerView: View {
                                 HStack{
                                     Image(systemName: "person.3.fill")
                                         .font(.system(size: 10))
-                                    Text("団体作成")
+                                    Text("団体追加")
                                         .font(.subheadline)
                                 }
                                 .foregroundColor(.white)
