@@ -6,53 +6,52 @@
 //
 
 import SwiftUI
+import Foundation
+
+extension Notification.Name {
+    static let groupCreated = Notification.Name("groupCreated")
+}
 
 class CreateNewGroupViewModel: ObservableObject {
     @Published var groupName: String = ""
-    @Published var selectedImage: UIImage?
     @Published var password: String = ""
-    @Published var showingAlert = false
-    @Published var alertMessage = ""
+    @Published var groupImage: UIImage?
+    @Published var isCreating = false
+    @Published var showError = false
+    @Published var errorMessage = ""
     @Published var showingImagePicker = false
-    @Published var isLoading = false
-
-    func createGroup() {
-        guard !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alertMessage = "グループ名を入力してください"
-            showingAlert = true
+    
+    func createGroup() async {
+        guard !groupName.isEmpty else {
+            showError = true
+            errorMessage = "グループ名を入力してください"
             return
         }
         
-        guard !password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alertMessage = "パスワードを入力してください"
-            showingAlert = true
+        guard let _ = groupImage else {
+            showError = true
+            errorMessage = "グループ画像を選択してください"
             return
         }
         
-        guard selectedImage != nil else {
-            alertMessage = "グループ画像を選択してください"
-            showingAlert = true
+        guard !password.isEmpty else {
+            showError = true
+            errorMessage = "パスワードを入力してください"
             return
         }
-
-        isLoading = true
         
-        Task {
-            do {
-                if let image = selectedImage {
-                    // TODO: グループの保存処理
-                    print("Group created with name: \(groupName), password: \(password)")
-                }
-                await MainActor.run {
-                    isLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    isLoading = false
-                    alertMessage = "グループの作成に失敗しました"
-                    showingAlert = true
-                }
-            }
+        await MainActor.run {
+            isCreating = true
+        }
+        
+        // TODO: 実際のAPI呼び出しに置き換える
+        // 開発用のモックデータ
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        
+        await MainActor.run {
+            isCreating = false
+            // TODO: グループ作成成功時の処理
+            NotificationCenter.default.post(name: .groupCreated, object: nil)
         }
     }
 }

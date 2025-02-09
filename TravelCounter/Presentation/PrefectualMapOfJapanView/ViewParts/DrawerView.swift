@@ -15,6 +15,7 @@ struct DrawerView: View {
     let onCreatePost: () -> Void
     
     @State private var expandedGroupIds: Set<Int> = []
+    @State private var showingGroupSelection = false
     
     var body: some View {
         HStack(spacing: 0) {
@@ -63,7 +64,7 @@ struct DrawerView: View {
                             }
                             
                             Button(action: {
-                                onCreateGroup()
+                                showingGroupSelection = true
                                 onClose()
                             }) {
                                 HStack{
@@ -216,6 +217,9 @@ struct DrawerView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sheet(isPresented: $showingGroupSelection) {
+            GroupSelectionView()
+        }
     }
     
     private func toggleGroup(_ groupId: Int) {

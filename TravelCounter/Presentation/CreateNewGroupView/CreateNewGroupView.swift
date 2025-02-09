@@ -12,36 +12,33 @@ struct CreateNewGroupView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("グループ情報")) {
-                    TextField("グループ名", text: $viewModel.groupName)
-                        .textContentType(.organizationName)
-                    
-                    SecureField("パスワード", text: $viewModel.password)
-                        .textContentType(.newPassword)
-                }
+        VStack(spacing: 10) {
+            Text("新規グループ作成")
+                .font(.title3)
+                .bold()
+                .padding(.vertical)
                 
-                Section(header: Text("グループ画像")) {
+            Form {
+                Section {
                     HStack {
                         Spacer()
                         VStack {
-                            if let image = viewModel.selectedImage {
+                            if let image = viewModel.groupImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 200, height: 200)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(Circle())
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
+                                        Circle()
                                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                                     )
                             } else {
-                                RoundedRectangle(cornerRadius: 12)
+                                Circle()
                                     .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 200, height: 200)
+                                    .frame(width: 100, height: 100)
                                     .overlay(
-                                        Image(systemName: "photo.fill")
+                                        Image(systemName: "person.3.fill")
                                             .font(.system(size: 40))
                                             .foregroundColor(.gray)
                                     )
@@ -50,47 +47,45 @@ struct CreateNewGroupView: View {
                             Button(action: {
                                 viewModel.showingImagePicker = true
                             }) {
-                                Text(viewModel.selectedImage == nil ? "画像を選択" : "画像を変更")
-                                    .padding(.top, 8)
+                                Text(viewModel.groupImage == nil ? "画像を選択" : "画像を変更")
+                                    .foregroundColor(.blue)
                             }
+                            .padding(.top, 8)
                         }
                         Spacer()
                     }
                     .padding(.vertical, 8)
                 }
-            }
-            .navigationTitle("グループ作成")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("キャンセル") {
-                        dismiss()
-                    }
+                
+                Section {
+                    TextField("グループ名", text: $viewModel.groupName)
+                    SecureField("パスワード", text: $viewModel.password)
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("作成") {
-                        viewModel.createGroup()
+                Section {
+                    Button(action: {
+                        Task {
+                            await viewModel.createGroup()
+                        }
+                    }) {
+                        if viewModel.isCreating {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                        } else {
+                            Text("グループを作成")
+                        }
                     }
-                    .disabled(viewModel.isLoading)
+                    .disabled(viewModel.isCreating)
                 }
             }
-            .overlay {
-                if viewModel.isLoading {
-                    ProgressView("作成中...")
-                        .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(8)
-                }
-            }
-            .sheet(isPresented: $viewModel.showingImagePicker) {
-                ImagePicker(image: $viewModel.selectedImage)
-            }
-            .alert("エラー", isPresented: $viewModel.showingAlert) {
-                Button("OK") {}
-            } message: {
-                Text(viewModel.alertMessage)
-            }
+        }
+        .sheet(isPresented: $viewModel.showingImagePicker) {
+            ImagePicker(image: $viewModel.groupImage)
+        }
+        .alert("エラー", isPresented: $viewModel.showError) {
+            Button("OK") {}
+        } message: {
+            Text(viewModel.errorMessage)
         }
     }
 }
