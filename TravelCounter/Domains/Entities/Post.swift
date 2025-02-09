@@ -7,6 +7,7 @@
 
 import Foundation
 import MapKit
+import CoreLocation
 
 struct Post: Identifiable {
     let id: Int
@@ -16,4 +17,6 @@ struct Post: Identifiable {
     let comment: String
     let date: Date
     let coordinate: CLLocationCoordinate2D
+    let prefectureId: String
+    let groupIds: [Int]
 }
