@@ -43,6 +43,23 @@ class GroupRepository: GroupRepositoryProtocol {
         }
         #endif
     }
+    
+    func getGroup(groupId: Int) async throws -> UserGroup {
+        #if DEBUG
+        return try await debugGetGroup(groupId: groupId)
+        #else
+        let request = GetGroupRequest(groupId: groupId)
+        let response = try await apiClient.call(request: request)
+        
+        return UserGroup(
+            id: groupId,
+            name: response.name,
+            imageURL: response.icon,
+            users: [],  // APIからユーザー情報は返ってこないため空配列を設定
+            password: "" // APIからパスワードは返ってこないため空文字を設定
+        )
+        #endif
+    }
 }
 
 #if DEBUG
@@ -88,6 +105,29 @@ private extension GroupRepository {
             ]
         default:
             return []
+        }
+    }
+    
+    func debugGetGroup(groupId: Int) async throws -> UserGroup {
+        switch groupId {
+        case 1:
+            return UserGroup(
+                id: 1,
+                name: "家族",
+                imageURL: "house.fill",
+                users: [],
+                password: "family2024"
+            )
+        case 2:
+            return UserGroup(
+                id: 2,
+                name: "友達",
+                imageURL: "person.2.fill",
+                users: [],
+                password: "friends2024"
+            )
+        default:
+            throw NSError(domain: "GroupRepository", code: 404, userInfo: [NSLocalizedDescriptionKey: "グループが見つかりません"])
         }
     }
 }

@@ -7,8 +7,9 @@ struct FoundGroup {
 
 extension Notification.Name {
     static let groupJoined = Notification.Name("groupJoined")
-} 
+}
 
+@MainActor
 class JoinGroupViewModel: ObservableObject {
     @Published var groupId: String = ""
     @Published var password: String = ""
@@ -18,6 +19,12 @@ class JoinGroupViewModel: ObservableObject {
     @Published var showError = false
     @Published var errorMessage = ""
     
+    private let getGroupUseCase: GetGroupUseCase
+    
+    init(getGroupUseCase: GetGroupUseCase = GetGroupUseCase()) {
+        self.getGroupUseCase = getGroupUseCase
+    }
+    
     func searchGroup() {
         guard !groupId.isEmpty else {
             showError = true
@@ -25,21 +32,28 @@ class JoinGroupViewModel: ObservableObject {
             return
         }
         
-        isSearching = true
+        guard let groupIdInt = Int(groupId) else {
+            showError = true
+            errorMessage = "グループIDは数値で入力してください"
+            return
+        }
         
-        // TODO: 実際のAPI呼び出しに置き換える
-        // 開発用のモックデータ
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            if self.groupId == "123" {
-                self.foundGroup = FoundGroup(
-                    name: "テストグループ",
-                    icon: "https://example.com/group-icon.jpg"
+        isSearching = true
+        showError = false
+        foundGroup = nil
+        
+        Task {
+            do {
+                let group = try await getGroupUseCase.execute(groupId: groupIdInt)
+                foundGroup = FoundGroup(
+                    name: group.name,
+                    icon: group.imageURL ?? ""
                 )
-            } else {
-                self.showError = true
-                self.errorMessage = "グループが見つかりませんでした"
+            } catch {
+                showError = true
+                errorMessage = "グループが見つかりませんでした"
             }
-            self.isSearching = false
+            isSearching = false
         }
     }
     
