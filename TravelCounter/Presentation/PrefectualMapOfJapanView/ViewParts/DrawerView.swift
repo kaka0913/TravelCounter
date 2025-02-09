@@ -110,7 +110,7 @@ struct DrawerView: View {
                                             
                                             Text(group.name)
                                                 .foregroundColor(selectedGroup?.id == group.id ? .blue : .primary)
-                                            
+                                        
                                             Spacer()
                                             
                                             Image(systemName: expandedGroupIds.contains(group.id) ? "chevron.down" : "chevron.right")
@@ -129,13 +129,23 @@ struct DrawerView: View {
                                     if expandedGroupIds.contains(group.id) {
                                         VStack(alignment: .leading, spacing: 12) {
                                             if expandedGroupIds.contains(group.id) {
-                                                HStack(spacing: 4) {
-                                                    Image(systemName: "key.fill")
-                                                        .font(.system(size: 12))
-                                                        .foregroundColor(.gray)
-                                                    Text("パスワード: \(group.password)")
-                                                        .font(.caption)
-                                                        .foregroundColor(.gray)
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    HStack(spacing: 4) {
+                                                        Image(systemName: "number")
+                                                            .font(.system(size: 12))
+                                                            .foregroundColor(.gray)
+                                                        Text("ID: \(group.id)")
+                                                            .font(.caption)
+                                                            .foregroundColor(.gray)
+                                                    }
+                                                    HStack(spacing: 4) {
+                                                        Image(systemName: "key.fill")
+                                                            .font(.system(size: 12))
+                                                            .foregroundColor(.gray)
+                                                        Text("パスワード: \(group.password)")
+                                                            .font(.caption)
+                                                            .foregroundColor(.gray)
+                                                    }
                                                 }
                                             }
                                             Button(action: {
