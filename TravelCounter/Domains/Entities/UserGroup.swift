@@ -9,6 +9,6 @@ struct UserGroup: Identifiable {
     let id: Int
     let name: String
     let imageURL: String?
-    let users: [UserProfile]
+    var users: [UserProfile]
     let password: String
 }
