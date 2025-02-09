@@ -60,6 +60,21 @@ class GroupRepository: GroupRepositoryProtocol {
         )
         #endif
     }
+    
+    func createGroup(name: String, icon: String, password: String, authorId: Int) async throws -> Int {
+        #if DEBUG
+        return try await debugCreateGroup(name: name, icon: icon, password: password, authorId: authorId)
+        #else
+        let request = CreateGroupRequest(
+            groupName: name,
+            icon: icon,
+            password: password,
+            authorId: authorId
+        )
+        let response = try await apiClient.call(request: request)
+        return response.groupId
+        #endif
+    }
 }
 
 #if DEBUG
@@ -129,6 +144,11 @@ private extension GroupRepository {
         default:
             throw NSError(domain: "GroupRepository", code: 404, userInfo: [NSLocalizedDescriptionKey: "グループが見つかりません"])
         }
+    }
+    
+    func debugCreateGroup(name: String, icon: String, password: String, authorId: Int) async throws -> Int {
+        // デバッグ用の簡単な実装
+        return Int.random(in: 1000...9999)
     }
 }
 #endif

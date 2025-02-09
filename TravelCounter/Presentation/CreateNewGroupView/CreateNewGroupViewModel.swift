@@ -12,6 +12,7 @@ extension Notification.Name {
     static let groupCreated = Notification.Name("groupCreated")
 }
 
+@MainActor
 class CreateNewGroupViewModel: ObservableObject {
     @Published var groupName: String = ""
     @Published var password: String = ""
@@ -21,6 +22,20 @@ class CreateNewGroupViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var showingImagePicker = false
     
+    @AppStorage("userId") private var userId: Int = 0
+    private let createGroupUseCase: CreateGroupUseCase
+    
+    init(createGroupUseCase: CreateGroupUseCase = CreateGroupUseCase()) {
+        self.createGroupUseCase = createGroupUseCase
+    }
+    
+    private func convertImageToBase64(_ image: UIImage) -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            return nil
+        }
+        return imageData.base64EncodedString()
+    }
+    
     func createGroup() async {
         guard !groupName.isEmpty else {
             showError = true
@@ -28,7 +43,7 @@ class CreateNewGroupViewModel: ObservableObject {
             return
         }
         
-        guard let _ = groupImage else {
+        guard let image = groupImage else {
             showError = true
             errorMessage = "グループ画像を選択してください"
             return
@@ -40,18 +55,34 @@ class CreateNewGroupViewModel: ObservableObject {
             return
         }
         
-        await MainActor.run {
-            isCreating = true
+        guard let imageBase64 = convertImageToBase64(image) else {
+            showError = true
+            errorMessage = "画像の変換に失敗しました"
+            return
         }
         
-        // TODO: 実際のAPI呼び出しに置き換える
-        // 開発用のモックデータ
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        isCreating = true
         
-        await MainActor.run {
+        do {
+            let groupId = try await createGroupUseCase.execute(
+                name: groupName,
+                icon: imageBase64,
+                password: password,
+                authorId: userId
+            )
+            
+            // グループ作成成功時の処理
+            NotificationCenter.default.post(
+                name: .groupCreated,
+                object: nil,
+                userInfo: ["groupId": groupId]
+            )
+            
             isCreating = false
-            // TODO: グループ作成成功時の処理
-            NotificationCenter.default.post(name: .groupCreated, object: nil)
+        } catch {
+            showError = true
+            errorMessage = "グループの作成に失敗しました"
+            isCreating = false
         }
     }
 }
