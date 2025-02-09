@@ -37,8 +37,54 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         self.getUserGroupsUseCase = getUserGroupsUseCase
         self.getGroupMembersUseCase = getGroupMembersUseCase
         setupMockData()
+        setupNotifications()
         fetchUserProfile()
         fetchUserGroups()
+    }
+    
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleGroupJoined),
+            name: .groupJoined,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleGroupCreated),
+            name: .groupCreated,
+            object: nil
+        )
+    }
+    
+    @objc private func handleGroupJoined(_ notification: Notification) {
+        Task { @MainActor in
+            await fetchUserGroups()
+            
+            // 参加したグループを選択状態にする
+            if let groupId = notification.userInfo?["groupId"] as? Int,
+               let joinedGroup = userGroups.first(where: { $0.id == groupId }) {
+                selectedGroup = joinedGroup
+                await fetchGroupMembers(groupId: groupId)
+            }
+        }
+    }
+    
+    @objc private func handleGroupCreated(_ notification: Notification) {
+        Task { @MainActor in
+            await fetchUserGroups()
+            
+            // 作成したグループを選択状態にする
+            if let groupId = notification.userInfo?["groupId"] as? Int,
+               let createdGroup = userGroups.first(where: { $0.id == groupId }) {
+                selectedGroup = createdGroup
+                await fetchGroupMembers(groupId: groupId)
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func fetchUserProfile() {

@@ -88,14 +88,12 @@ class JoinGroupViewModel: ObservableObject {
                     password: password
                 )
                 
-                // グループ参加成功時の処理
+                // グループ参加成功を通知
                 NotificationCenter.default.post(
                     name: .groupJoined,
                     object: nil,
                     userInfo: ["groupId": joinedGroupId]
                 )
-
-                //TODO: グループ参加成功時の処理
                 
                 isJoining = false
             } catch {

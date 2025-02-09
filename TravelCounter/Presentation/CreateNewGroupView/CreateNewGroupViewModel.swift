@@ -71,7 +71,7 @@ class CreateNewGroupViewModel: ObservableObject {
                 authorId: userId
             )
             
-            // グループ作成成功時の処理
+            // グループ作成成功を通知
             NotificationCenter.default.post(
                 name: .groupCreated,
                 object: nil,
