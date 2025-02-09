@@ -13,6 +13,8 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     @Published var selectedGroupMember: UserProfile?
     @Published var userProfile: UserProfile?
     @Published var isLoadingProfile = false
+    @Published var isLoadingGroups = false
+    @Published var isLoadingGroupMembers = false
     @Published var errorMessage: String?
     
     @AppStorage("userId") private var userId: Int = 0
@@ -23,11 +25,20 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     private var userPrefectureVisitCounts: [Int: [AMPrefecture: Int]] = [:]
     
     private let getProfileUseCase: GetProfileUseCase
+    private let getUserGroupsUseCase: GetUserGroupsUseCase
+    private let getGroupMembersUseCase: GetGroupMembersUseCase
     
-    init(getProfileUseCase: GetProfileUseCase = GetProfileUseCase()) {
+    init(
+        getProfileUseCase: GetProfileUseCase = GetProfileUseCase(),
+        getUserGroupsUseCase: GetUserGroupsUseCase = GetUserGroupsUseCase(),
+        getGroupMembersUseCase: GetGroupMembersUseCase = GetGroupMembersUseCase()
+    ) {
         self.getProfileUseCase = getProfileUseCase
+        self.getUserGroupsUseCase = getUserGroupsUseCase
+        self.getGroupMembersUseCase = getGroupMembersUseCase
         setupMockData()
         fetchUserProfile()
+        fetchUserGroups()
     }
     
     private func fetchUserProfile() {
@@ -51,32 +62,53 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
         }
     }
     
-    private func setupMockData() {
-        // グループとユーザーのモックデータ
-        userGroups = [
-            UserGroup(
-                id: 1,
-                name: "家族",
-                imageURL: "house.fill",
-                users: [
-                    UserProfile(id: 1, name: "父", imageURL: nil),
-                    UserProfile(id: 2, name: "母", imageURL: nil),
-                    UserProfile(id: 3, name: "兄", imageURL: nil)
-                ],
-                password: "family2024"
-            ),
-            UserGroup(
-                id: 2,
-                name: "友達",
-                imageURL: "person.2.fill",
-                users: [
-                    UserProfile(id: 4, name: "友達A", imageURL: nil),
-                    UserProfile(id: 5, name: "友達B", imageURL: nil)
-                ],
-                password: "friends2024"
-            )
-        ]
+    private func fetchUserGroups() {
+        isLoadingGroups = true
+        errorMessage = nil
         
+        Task {
+            do {
+                let groups = try await getUserGroupsUseCase.execute(userId: userId)
+                await MainActor.run {
+                    self.userGroups = groups
+                    self.isLoadingGroups = false
+                }
+                
+                // グループ一覧取得後、各グループのメンバー情報を取得
+                for group in groups {
+                    await fetchGroupMembers(groupId: group.id)
+                }
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "グループの取得に失敗しました"
+                    self.isLoadingGroups = false
+                }
+            }
+        }
+    }
+    
+    private func fetchGroupMembers(groupId: Int) async {
+        do {
+            let members = try await getGroupMembersUseCase.execute(groupId: groupId)
+            await MainActor.run {
+                if let index = self.userGroups.firstIndex(where: { $0.id == groupId }) {
+                    var updatedGroup = self.userGroups[index]
+                    updatedGroup.users = members
+                    self.userGroups[index] = updatedGroup
+                    
+                    if self.selectedGroup?.id == groupId {
+                        self.selectedGroup = updatedGroup
+                    }
+                }
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "グループ「\(self.userGroups.first(where: { $0.id == groupId })?.name ?? "")」のメンバー取得に失敗しました"
+            }
+        }
+    }
+    
+    private func setupMockData() {
         // ユーザーごとの訪問回数データ
         userRegionVisitCounts = [
             0: [.hokkaido: 2, .tohoku: 3, .kanto: 10],  // 現在のユーザー
@@ -133,6 +165,13 @@ class PrefectualMapOfJapanViewModel: ObservableObject {
     func selectGroup(_ group: UserGroup) {
         selectedGroup = group
         selectedGroupMember = nil  // グループ選択時はメンバー選択をリセット
+        
+        // メンバー情報が空の場合のみ再取得
+        if group.users.isEmpty {
+            Task {
+                await fetchGroupMembers(groupId: group.id)
+            }
+        }
     }
     
     func selectGroupMember(_ member: UserProfile) {
