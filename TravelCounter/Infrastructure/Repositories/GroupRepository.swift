@@ -75,6 +75,20 @@ class GroupRepository: GroupRepositoryProtocol {
         return response.groupId
         #endif
     }
+    
+    func joinGroup(userId: Int, groupId: Int, password: String) async throws -> Int {
+        #if DEBUG
+        return try await debugJoinGroup(userId: userId, groupId: groupId, password: password)
+        #else
+        let request = JoinGroupRequest(
+            userId: userId,
+            groupId: groupId,
+            password: password
+        )
+        let response = try await apiClient.call(request: request)
+        return response.groupId
+        #endif
+    }
 }
 
 #if DEBUG
@@ -149,6 +163,15 @@ private extension GroupRepository {
     func debugCreateGroup(name: String, icon: String, password: String, authorId: Int) async throws -> Int {
         // デバッグ用の簡単な実装
         return Int.random(in: 1000...9999)
+    }
+    
+    func debugJoinGroup(userId: Int, groupId: Int, password: String) async throws -> Int {
+        // パスワードの検証
+        let group = try await debugGetGroup(groupId: groupId)
+        guard group.password == password else {
+            throw NSError(domain: "GroupRepository", code: 401, userInfo: [NSLocalizedDescriptionKey: "パスワードが正しくありません"])
+        }
+        return groupId
     }
 }
 #endif

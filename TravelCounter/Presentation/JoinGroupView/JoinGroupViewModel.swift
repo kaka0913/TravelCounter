@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 struct FoundGroup {
     let name: String
@@ -7,7 +8,7 @@ struct FoundGroup {
 
 extension Notification.Name {
     static let groupJoined = Notification.Name("groupJoined")
-}
+} 
 
 @MainActor
 class JoinGroupViewModel: ObservableObject {
@@ -19,10 +20,16 @@ class JoinGroupViewModel: ObservableObject {
     @Published var showError = false
     @Published var errorMessage = ""
     
+    @AppStorage("userId") private var userId: Int = 0
     private let getGroupUseCase: GetGroupUseCase
+    private let joinGroupUseCase: JoinGroupUseCase
     
-    init(getGroupUseCase: GetGroupUseCase = GetGroupUseCase()) {
+    init(
+        getGroupUseCase: GetGroupUseCase = GetGroupUseCase(),
+        joinGroupUseCase: JoinGroupUseCase = JoinGroupUseCase()
+    ) {
         self.getGroupUseCase = getGroupUseCase
+        self.joinGroupUseCase = joinGroupUseCase
     }
     
     func searchGroup() {
@@ -64,19 +71,38 @@ class JoinGroupViewModel: ObservableObject {
             return
         }
         
-        isJoining = true
+        guard let groupIdInt = Int(groupId) else {
+            showError = true
+            errorMessage = "グループIDが不正です"
+            return
+        }
         
-        // TODO: 実際のAPI呼び出しに置き換える
-        // 開発用のモックデータ
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            if self.password == "test123" {
-                // TODO: グループ参加成功時の処理
-                NotificationCenter.default.post(name: .groupJoined, object: nil)
-            } else {
-                self.showError = true
-                self.errorMessage = "パスワードが正しくありません"
+        isJoining = true
+        showError = false
+        
+        Task {
+            do {
+                let joinedGroupId = try await joinGroupUseCase.execute(
+                    userId: userId,
+                    groupId: groupIdInt,
+                    password: password
+                )
+                
+                // グループ参加成功時の処理
+                NotificationCenter.default.post(
+                    name: .groupJoined,
+                    object: nil,
+                    userInfo: ["groupId": joinedGroupId]
+                )
+
+                //TODO: グループ参加成功時の処理
+                
+                isJoining = false
+            } catch {
+                showError = true
+                errorMessage = "グループへの参加に失敗しました。パスワードを確認してください。"
+                isJoining = false
             }
-            self.isJoining = false
         }
     }
 }
