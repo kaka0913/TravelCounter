@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreLocation
+import AMJpnMap
 
 class CreateNewPostViewModel: ObservableObject {
     @Published var image: UIImage?
@@ -19,11 +20,16 @@ class CreateNewPostViewModel: ObservableObject {
     @Published var locationName: String?
     @Published var selectedPrefectureId: Int?
     @Published var showingLocationSearch = false
+    @Published var isCreating = false
     
+    private let createPostUseCase: CreatePostUseCase
+    private let geocoder = CLGeocoder()
     private(set) var currentUserId: Int
     private(set) var userGroups: [UserGroup]
     
-    init() {
+    init(createPostUseCase: CreatePostUseCase = CreatePostUseCase()) {
+        self.createPostUseCase = createPostUseCase
+        
         // 現在のユーザーのデータを取得
         let currentUser = UserProfile(id: 0, name: "現在のユーザー", imageURL: nil)
         self.currentUserId = currentUser.id
@@ -62,33 +68,98 @@ class CreateNewPostViewModel: ObservableObject {
         }
     }
     
-    func createPost() {
+    private func convertImageToBase64(_ image: UIImage) -> String? {
+        // 画像を圧縮してデータサイズを削減
+        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+            return nil
+        }
+        return imageData.base64EncodedString()
+    }
+    
+    private func getPrefectureId(from location: CLLocationCoordinate2D) async throws -> String {
+        let location = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        let placemarks = try await geocoder.reverseGeocodeLocation(location)
+        
+        guard let prefecture = placemarks.first?.administrativeArea else {
+            throw NSError(domain: "CreateNewPostViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "都道府県の取得に失敗しました"])
+        }
+        
+        guard let prefecture = AMPrefecture.fromJapaneseName(prefecture) else {
+            throw NSError(domain: "CreateNewPostViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "都道府県の変換に失敗しました"])
+        }
+        
+        return prefecture.prefectureId
+    }
+    
+    func createPost() async -> Bool {
         // バリデーション
-        guard let _ = image else {
-            alertMessage = "画像を選択してください"
-            showingAlert = true
-            return
+        guard let image = image else {
+            await MainActor.run {
+                alertMessage = "画像を選択してください"
+                showingAlert = true
+            }
+            return false
         }
         
         guard !comment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alertMessage = "コメントを入力してください"
-            showingAlert = true
-            return
+            await MainActor.run {
+                alertMessage = "コメントを入力してください"
+                showingAlert = true
+            }
+            return false
         }
         
-        guard let _ = location else {
-            alertMessage = "位置情報を設定してください"
-            showingAlert = true
-            return
+        guard let location = location else {
+            await MainActor.run {
+                alertMessage = "位置情報を設定してください"
+                showingAlert = true
+            }
+            return false
         }
         
         guard selectedGroups.count > 0 else {
-            alertMessage = "少なくとも1つのグループを選択してください"
-            showingAlert = true
-            return
+            await MainActor.run {
+                alertMessage = "少なくとも1つのグループを選択してください"
+                showingAlert = true
+            }
+            return false
         }
         
-        // TODO: 投稿の保存処理
-        print("Post created")
+        guard let imageBase64 = convertImageToBase64(image) else {
+            await MainActor.run {
+                alertMessage = "画像の変換に失敗しました"
+                showingAlert = true
+            }
+            return false
+        }
+        
+        await MainActor.run {
+            isCreating = true
+        }
+        
+        do {
+            let prefectureId = try await getPrefectureId(from: location)
+            let success = try await createPostUseCase.execute(
+                image: imageBase64,
+                comment: comment,
+                coordinate: location,
+                userId: currentUserId,
+                prefectureId: prefectureId,
+                groupIds: Array(selectedGroups)
+            )
+            
+            await MainActor.run {
+                isCreating = false
+            }
+            
+            return success
+        } catch {
+            await MainActor.run {
+                alertMessage = error.localizedDescription
+                showingAlert = true
+                isCreating = false
+            }
+            return false
+        }
     }
 }
