@@ -25,8 +25,4 @@ class ProfileSettingViewModel: ObservableObject {
         // TODO: プロフィール情報の保存処理
         // UserDefaultsやデータベースへの保存処理を実装
     }
-    
-    func loadProfile() {
-        // TODO: 保存されているプロフィール情報の読み込み処理
-    }
 }

@@ -63,9 +63,6 @@ struct ProfileSettingView: View {
             } message: {
                 Text(viewModel.alertMessage)
             }
-            .onAppear {
-                viewModel.loadProfile()
-            }
         }
     }
 }
