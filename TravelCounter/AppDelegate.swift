@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/01/29.
+//  Created by 仲野将馬 on 2025/01/29.
 //
 
 import UIKit

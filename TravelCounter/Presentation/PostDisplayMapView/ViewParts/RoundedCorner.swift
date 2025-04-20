@@ -2,7 +2,7 @@
 //  RoundedCorner.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import SwiftUI
