@@ -101,3 +101,4 @@ test-results.xcresult
 ## 設定ファイル
 GoogleService-Info.plist
 Firebase Authentication Info.plist
+.vscode/settings.json
