@@ -13,6 +13,7 @@ struct DrawerView: View {
     let onResetSelect: () -> Void
     let onCreateGroup: () -> Void
     let onCreatePost: () -> Void
+    let onLogout: () -> Void
     
     @State private var expandedGroupIds: Set<Int> = []
     @State private var showingGroupSelection = false
@@ -197,6 +198,25 @@ struct DrawerView: View {
                         }
                     }
                     
+                    // ログアウトボタン
+                    Button(action: {
+                        onLogout()
+                        onClose()
+                    }) {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.system(size: 16))
+                            Text("Googleログアウト")
+                                .font(.subheadline)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color.red)
+                        .cornerRadius(8)
+                    }
+                    .padding(.bottom, 20)
+                    
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -229,4 +249,4 @@ struct DrawerView: View {
             expandedGroupIds.insert(groupId)
         }
     }
-} 
+}
