@@ -2,7 +2,7 @@
 //  ProfileSettingViewModel.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import SwiftUI
@@ -24,9 +24,5 @@ class ProfileSettingViewModel: ObservableObject {
         
         // TODO: プロフィール情報の保存処理
         // UserDefaultsやデータベースへの保存処理を実装
-    }
-    
-    func loadProfile() {
-        // TODO: 保存されているプロフィール情報の読み込み処理
     }
 }

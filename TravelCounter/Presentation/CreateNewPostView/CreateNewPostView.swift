@@ -2,7 +2,7 @@
 //  CreateNewPostView.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import SwiftUI
@@ -106,12 +106,18 @@ struct CreateNewPostView: View {
                     Button("キャンセル") {
                         dismiss()
                     }
+                    .disabled(viewModel.isCreating)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("投稿") {
-                        viewModel.createPost()
+                        Task {
+                            if await viewModel.createPost() {
+                                dismiss()
+                            }
+                        }
                     }
+                    .disabled(viewModel.isCreating)
                 }
             }
             .sheet(isPresented: $viewModel.showingImagePicker) {
@@ -127,6 +133,15 @@ struct CreateNewPostView: View {
                 Button("OK") {}
             } message: {
                 Text(viewModel.alertMessage)
+            }
+            .overlay {
+                if viewModel.isCreating {
+                    ProgressView("投稿を作成中...")
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(radius: 4)
+                }
             }
         }
     }

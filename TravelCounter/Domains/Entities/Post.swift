@@ -2,11 +2,12 @@
 //  Post.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import Foundation
 import MapKit
+import CoreLocation
 
 struct Post: Identifiable {
     let id: Int
@@ -16,4 +17,6 @@ struct Post: Identifiable {
     let comment: String
     let date: Date
     let coordinate: CLLocationCoordinate2D
+    let prefectureId: String
+    let groupIds: [Int]
 }

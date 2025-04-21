@@ -1,13 +1,13 @@
 {
-  "originHash" : "d044b30977a403bd4f5fb16d3b9dcf6797307034598741020299eea8f8f4ef3a",
+  "originHash" : "a5fe496e1a9d7faad1860dbe7116cb436cdcd2b6aa2629c86349b2334849568a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/abseil-cpp-binary.git",
       "state" : {
-        "revision" : "194a6706acbd25e4ef639bcaddea16e8758a3e27",
-        "version" : "1.2024011602.0"
+        "revision" : "bbe8b69694d7873315fd3a4ad41efe043e1c07c5",
+        "version" : "1.2024072200.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/firebase-ios-sdk",
       "state" : {
-        "revision" : "0d885d28250fb1196b614bc9455079b75c531f72",
-        "version" : "11.7.0"
+        "revision" : "d1f7c7e8eaa74d7e44467184dc5f592268247d33",
+        "version" : "11.11.0"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleAppMeasurement.git",
       "state" : {
-        "revision" : "be0881ff728eca210ccb628092af400c086abda3",
-        "version" : "11.7.0"
+        "revision" : "dd89fc79a77183830742a16866d87e4e54785734",
+        "version" : "11.11.0"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/grpc-binary.git",
       "state" : {
-        "revision" : "f56d8fc3162de9a498377c7b6cea43431f4f5083",
-        "version" : "1.65.1"
+        "revision" : "cc0001a0cf963aa40501d9c2b181e7fc9fd8ec71",
+        "version" : "1.69.0"
       }
     },
     {
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/interop-ios-for-google-sdks.git",
       "state" : {
-        "revision" : "2d12673670417654f08f5f90fdd62926dc3a2648",
-        "version" : "100.0.0"
+        "revision" : "040d087ac2267d2ddd4cca36c757d1c6a05fdbfe",
+        "version" : "101.0.0"
       }
     },
     {
@@ -166,7 +166,7 @@
     {
       "identity" : "tapablejapanmapbyprefecture",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:kaka0913/TapableJapanMapByPrefecture.git",
+      "location" : "https://github.com/kaka0913/TapableJapanMapByPrefecture.git",
       "state" : {
         "branch" : "master",
         "revision" : "d4cb1d28439132407fbcbf86cb8d94768911d353"

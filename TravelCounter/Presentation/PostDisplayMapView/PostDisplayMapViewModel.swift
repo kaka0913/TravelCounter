@@ -2,7 +2,7 @@
 //  PostDisplayViewModel.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import SwiftUI
@@ -19,31 +19,22 @@ class PostDisplayMapViewModel: ObservableObject {
     @Published var selectedPost: Post? = nil
     @Published var showingPostDetail = false
     @Published var selectedPrefecture: AMPrefecture?
+    @Published var isLoading = false
+    @Published var errorMessage: String?
     
+    private let getMapPostsUseCase: GetMapPostsUseCase
+    private let getPostDetailUseCase: GetPostDetailUseCase
     private let geocoder = CLGeocoder()
     private var lastUpdateTime: Date = Date()
     private var isUpdating = false
     private var updateTimer: Timer?
     
-    init() {
-        // サンプルデータ
-        let dateFormatter = ISO8601DateFormatter()
-        posts = [
-            Post(id: 1,
-                 userId: 101,
-                 userName: "山田太郎",
-                 image: "sample1",
-                 comment: "東京タワーに行ってきました！",
-                 date: dateFormatter.date(from: "2025-01-30T15:04:05Z") ?? Date(),
-                 coordinate: CLLocationCoordinate2D(latitude: 35.6812, longitude: 139.7671)),
-            Post(id: 2,
-                 userId: 102,
-                 userName: "鈴木花子",
-                 image: "sample2",
-                 comment: "スカイツリーの夜景が綺麗でした",
-                 date: dateFormatter.date(from: "2025-02-01T18:30:00Z") ?? Date(),
-                 coordinate: CLLocationCoordinate2D(latitude: 35.6912, longitude: 139.7771))
-        ]
+    init(
+        getMapPostsUseCase: GetMapPostsUseCase = GetMapPostsUseCase(),
+        getPostDetailUseCase: GetPostDetailUseCase = GetPostDetailUseCase()
+    ) {
+        self.getMapPostsUseCase = getMapPostsUseCase
+        self.getPostDetailUseCase = getPostDetailUseCase
     }
     
     func focusOnPrefecture(_ prefecture: AMPrefecture) {
@@ -54,11 +45,56 @@ class PostDisplayMapViewModel: ObservableObject {
             center: location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: location.zoomLevel, longitudeDelta: location.zoomLevel)
         )
+        
+        // 都道府県が変更されたら投稿を再取得
+        Task {
+            await fetchPosts(for: prefecture)
+        }
+    }
+    
+    private func fetchPosts(for prefecture: AMPrefecture) async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
+        
+        do {
+            // TODO: 選択されているグループIDを取得する
+            let groupIds: [Int] = [1] // 仮の実装
+            let posts = try await getMapPostsUseCase.execute(
+                prefectureId: prefecture.name,
+                groupIds: groupIds
+            )
+            
+            await MainActor.run {
+                self.posts = posts
+                isLoading = false
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "投稿の取得に失敗しました"
+                isLoading = false
+            }
+        }
+    }
+    
+    func selectPost(_ post: Post) async {
+        do {
+            let detailPost = try await getPostDetailUseCase.execute(postId: post.id)
+            await MainActor.run {
+                self.selectedPost = detailPost
+                self.showingPostDetail = true
+            }
+        } catch {
+            await MainActor.run {
+                self.errorMessage = "投稿の詳細取得に失敗しました"
+            }
+        }
     }
     
     func scheduleVisiblePrefecturesUpdate(for region: MKCoordinateRegion) {
         updateTimer?.invalidate()
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { [weak self] _ in
             self?.updateVisiblePrefectures(for: region)
         }
     }
@@ -78,8 +114,6 @@ class PostDisplayMapViewModel: ObservableObject {
                     let newVisiblePrefectures: Set<String> = [prefecture]
                     if newVisiblePrefectures != self.visiblePrefectures {
                         self.visiblePrefectures = newVisiblePrefectures
-                        //TODO: 都道府県が変わった時の処理
-                        print("表示されている都道府県が変更されました: \(Array(newVisiblePrefectures))")
                     }
                 }
                 self.isUpdating = false

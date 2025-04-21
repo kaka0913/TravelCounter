@@ -1,8 +1,11 @@
 import SwiftUI
 import AMJpnMap
+import Firebase
+import GoogleSignIn
 
 struct PrefectualMapOfJapanView: View {
     @StateObject private var viewModel = PrefectualMapOfJapanViewModel()
+    @StateObject private var authViewModel = AuthViewModel()
     @State private var isDrawerOpen = false
     @State private var mapScale: CGFloat = 1.0
     @State private var mapOffset: CGSize = .zero
@@ -220,6 +223,9 @@ struct PrefectualMapOfJapanView: View {
                     },
                     onCreatePost: {
                         showingCreateNewPost = true
+                    },
+                    onLogout: {
+                        authViewModel.signOut()
                     }
                 )
                 .zIndex(1)

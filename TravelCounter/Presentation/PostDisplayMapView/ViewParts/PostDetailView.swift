@@ -2,7 +2,7 @@
 //  PostDetailView.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/05.
+//  Created by 仲野将馬 on 2025/02/05.
 //
 
 import SwiftUI
@@ -37,12 +37,6 @@ struct PostDetailView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Text(post.userName)
-                            .font(.headline)
-                        Spacer()
-                    }
-                    .padding(.top, 8)
                     
                     if let image = UIImage(named: post.image) {
                         Image(uiImage: image)
@@ -56,11 +50,16 @@ struct PostDetailView: View {
                         .font(.body)
                         .padding(.vertical, 4)
                     
-                    Text(dateFormatter.string(from: post.date))
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 16)
-                    
+                    HStack {
+                        Text(post.userName)
+                            .font(.headline)
+                        
+                        Text(dateFormatter.string(from: post.date))
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .padding(.leading, 10)
+                            .padding(.top, 2)
+                    }
                     Spacer()
                 }
             }

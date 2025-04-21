@@ -2,7 +2,7 @@
 //  AuthView.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/01/29.
+//  Created by 仲野将馬 on 2025/01/29.
 //
 
 import SwiftUI
@@ -83,8 +83,14 @@ struct AuthView: View {
             .padding()
             
             // Googleログインボタン
-            GoogleSignInButton(action: viewModel.signInWithGoogle)
-                .padding(.horizontal, 20)
+            GoogleSignInButton {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                      let rootViewController = windowScene.windows.first?.rootViewController else {
+                    return
+                }
+                viewModel.signInWithGoogle(presenting: rootViewController)
+            }
+            .padding(.horizontal, 20)
         }
         .padding()
         .alert(isPresented: $viewModel.showError) {

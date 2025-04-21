@@ -2,7 +2,7 @@
 //  AMPrefecture.swift
 //  TravelCounter
 //
-//  Created by 株丹優一郎 on 2025/02/03.
+//  Created by 仲野将馬 on 2025/02/03.
 //
 
 import AMJpnMap
@@ -79,5 +79,61 @@ extension AMPrefecture {
         case .kagoshima: return "鹿児島県"
         case .okinawa: return "沖縄県"
         }
+    }
+    
+    var prefectureId: String {
+        switch self {
+        case .hokkaido: return "hokkaido"
+        case .aomori: return "aomori"
+        case .iwate: return "iwate"
+        case .miyagi: return "miyagi"
+        case .akita: return "akita"
+        case .yamagata: return "yamagata"
+        case .fukushima: return "fukushima"
+        case .ibaraki: return "ibaraki"
+        case .tochigi: return "tochigi"
+        case .gunma: return "gunma"
+        case .saitama: return "saitama"
+        case .chiba: return "chiba"
+        case .tokyo: return "tokyo"
+        case .kanagawa: return "kanagawa"
+        case .niigata: return "niigata"
+        case .toyama: return "toyama"
+        case .ishikawa: return "ishikawa"
+        case .fukui: return "fukui"
+        case .yamanashi: return "yamanashi"
+        case .nagano: return "nagano"
+        case .gifu: return "gifu"
+        case .shizuoka: return "shizuoka"
+        case .aichi: return "aichi"
+        case .mie: return "mie"
+        case .shiga: return "shiga"
+        case .kyoto: return "kyoto"
+        case .osaka: return "osaka"
+        case .hyogo: return "hyogo"
+        case .nara: return "nara"
+        case .wakayama: return "wakayama"
+        case .tottori: return "tottori"
+        case .shimane: return "shimane"
+        case .okayama: return "okayama"
+        case .hiroshima: return "hiroshima"
+        case .yamaguchi: return "yamaguchi"
+        case .tokushima: return "tokushima"
+        case .kagawa: return "kagawa"
+        case .ehime: return "ehime"
+        case .kochi: return "kochi"
+        case .fukuoka: return "fukuoka"
+        case .saga: return "saga"
+        case .nagasaki: return "nagasaki"
+        case .kumamoto: return "kumamoto"
+        case .oita: return "oita"
+        case .miyazaki: return "miyazaki"
+        case .kagoshima: return "kagoshima"
+        case .okinawa: return "okinawa"
+        }
+    }
+    
+    static func fromJapaneseName(_ name: String) -> AMPrefecture? {
+        return AMPrefecture.allCases.first { $0.name == name }
     }
 }
